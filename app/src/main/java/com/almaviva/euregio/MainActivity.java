@@ -33,8 +33,10 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         try {
+
 
             setComponent();
 
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
                   bottomNavigation.setCurrentItem(position);
                      viewPager.setCurrentItem(position);
                  }
+
                 }
             });
 
