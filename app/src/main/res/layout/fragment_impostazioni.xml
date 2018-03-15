@@ -2,12 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.almaviva.euregio.fragment.VantaggiFragment">
+    tools:context="com.almaviva.euregio.fragment.ImpostazioniFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@android:string/VideoView_error_title" />
+        android:text="planetext" />
 
 </FrameLayout>

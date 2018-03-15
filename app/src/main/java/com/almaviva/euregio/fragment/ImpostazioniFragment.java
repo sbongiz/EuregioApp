@@ -11,31 +11,25 @@ import android.view.ViewGroup;
 import com.almaviva.euregio.R;
 
 
-
-public class VantaggiFragment extends Fragment {
+public class ImpostazioniFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
 
-    public VantaggiFragment() {
+    public ImpostazioniFragment() {
         // Required empty public constructor
     }
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_vantaggi, container, false);
+        return inflater.inflate(R.layout.fragment_impostazioni, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
