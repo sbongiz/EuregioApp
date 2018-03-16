@@ -3,7 +3,9 @@
     <string name="title_vantaggi">Vantaggi</string>
     <string name="title_euregio">Euregio</string>
     <string name="title_impostazioni">Impostazioni</string>
-
+    <string name="tab_lista">Lista</string>
+    <string name="tab_mappa">Mappa</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

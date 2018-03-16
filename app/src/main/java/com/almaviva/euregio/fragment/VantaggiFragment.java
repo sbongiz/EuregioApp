@@ -8,14 +8,13 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TableLayout;
 
 import com.almaviva.euregio.R;
-import com.almaviva.euregio.adapter.SwipePagerAdapter;
+import com.almaviva.euregio.pager.SwipePagerAdapter;
 
 
 public class VantaggiFragment extends Fragment {
@@ -51,11 +50,16 @@ public class VantaggiFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 
         setComponent();
-      //  viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
+                try {
+                    viewPager.setCurrentItem(tab.getPosition());
+
+                }catch (Exception e){
+                    Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+                }
             }
 
             @Override
@@ -97,14 +101,19 @@ public class VantaggiFragment extends Fragment {
 
 
     public void setComponent(){
-        tabLayout = getView().findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Tab 1"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab 2"));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        //viewPager = getView().findViewById(R.id.view_pager);
-        pagerAdapter = new SwipePagerAdapter(getChildFragmentManager(), tabLayout.getTabCount());
-        //viewPager.setAdapter(pagerAdapter);
+        try {
+            tabLayout = getView().findViewById(R.id.tab_layout);
+            tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tab_lista)));
+            tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tab_mappa)));
+            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+            viewPager = getView().findViewById(R.id.view_pager);
+            pagerAdapter = new SwipePagerAdapter(getChildFragmentManager(), tabLayout.getTabCount());
+            viewPager.setAdapter(pagerAdapter);
+        }catch(Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
     }
+
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
