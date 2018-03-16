@@ -5,19 +5,6 @@
     tools:context="com.almaviva.euregio.fragment.EuregioFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/bottom_navigation_height"
-        android:text="@android:string/dialog_alert_title" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="provaaaaaa" />
-
 
 
 </FrameLayout>
