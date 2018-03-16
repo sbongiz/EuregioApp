@@ -3,10 +3,13 @@ package com.almaviva.euregio.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import com.almaviva.euregio.R;
 
@@ -15,7 +18,7 @@ public class EuregioFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
-
+    private ImageView image;
     public EuregioFragment() {
         // Required empty public constructor
     }
@@ -30,12 +33,26 @@ public class EuregioFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View view;
         boolean isLogged = true;
         if (isLogged) {
-            return inflater.inflate(R.layout.fragment_euregio, container, false);
+            view =  inflater.inflate(R.layout.fragment_euregio, container, false);
         } else {
-            return inflater.inflate(R.layout.fragment_login, container, false);
+            view = inflater.inflate(R.layout.fragment_login, container, false);
         }
+
+
+        image = view.findViewById(R.id.card_image);
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               image.setImageResource(R.drawable.card_retro);
+            }
+        });
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
