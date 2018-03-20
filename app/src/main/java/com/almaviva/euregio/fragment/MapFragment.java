@@ -2,11 +2,14 @@ package com.almaviva.euregio.fragment;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -27,6 +31,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private MapView mapView;
     private BottomSheetBehavior mBottomSheetBehavior;
     private View bottomSheet;
+    private Marker currentMarker=null;
+
     GoogleMap googleMap;
 
     public MapFragment() {
@@ -51,36 +57,76 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             bottomSheet = view.findViewById(R.id.bottom_sheet);
             mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+            mBottomSheetBehavior.setPeekHeight(350);
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
             mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                 @Override
                 public void onStateChanged(View bottomSheet, int newState) {
 
-                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                   // if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
 
-                        Log.e("STATE CHANGE","STATE COLLAPSED");
-                    }
-                    if (newState == BottomSheetBehavior.STATE_DRAGGING){
-                        Log.e("STATE CHANGE", "STATE DRAGGING");
-                    }
-                    if(newState == BottomSheetBehavior.STATE_EXPANDED){
-                        Log.e("STATE CHANGE", "STATE EXPANDED");
-                    }
-                    if(newState == BottomSheetBehavior.STATE_HIDDEN){
-                        Log.e("STATE CHANGE", "STATE HIDDEN");
+                   //     Log.e("STATE CHANGE","STATE COLLAPSED");
+                   // }
+                   // if (newState == BottomSheetBehavior.STATE_DRAGGING){
+                   //     Log.e("STATE CHANGE", "STATE DRAGGING");
+                   // }
+                   // if(newState == BottomSheetBehavior.STATE_EXPANDED){
+                   //     Log.e("STATE CHANGE", "STATE EXPANDED");
+                   // }
+                   // if(newState == BottomSheetBehavior.STATE_HIDDEN){
+                   //     Log.e("STATE CHANGE", "STATE HIDDEN");
 
-                    }
-                    if(newState == BottomSheetBehavior.STATE_SETTLING){
-                       Log.e("STATE CHANGE", "STATE SETTLING");
-                    }
-                    if(newState == BottomSheetBehavior.PEEK_HEIGHT_AUTO){
-                        Log.e("STATE CHANGE", "STATE HEIGHT AUTO");
-                    }
+                   // }
+                   // if(newState == BottomSheetBehavior.STATE_SETTLING){
+                   //    Log.e("STATE CHANGE", "STATE SETTLING");
+                   // }
+                   // if(newState == BottomSheetBehavior.PEEK_HEIGHT_AUTO){
+                   //     Log.e("STATE CHANGE", "STATE HEIGHT AUTO");
+                   // }
                 }
                 @Override
                 public void onSlide(View bottomSheet, float slideOffset) {
 
+                }
+            });
+
+
+            bottomSheet.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    if(currentMarker!=null){
+                    centerMarker(currentMarker);
+                    }
+                    return true;
+                }
+            });
+            bottomSheet.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View view) {
+                    if(currentMarker!=null){
+                        centerMarker(currentMarker);
+                    }
+                    if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED){
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    }else if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED){
+                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    }
+                }
+            });
+
+            bottomSheet.setOnTouchListener(new View.OnTouchListener(){
+
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED && motionEvent.getAction() == MotionEvent.ACTION_MOVE){
+                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    }else if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED && motionEvent.getAction() == MotionEvent.ACTION_MOVE){
+                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    }
+                    return false;
                 }
             });
 
@@ -126,25 +172,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                currentMarker = marker;
 
-                Log.e("CURRENT STATE", String.valueOf(mBottomSheetBehavior.getState()));
-               if(mBottomSheetBehavior.getState()!= BottomSheetBehavior.STATE_EXPANDED){
-                   mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                   Log.e("PEEK HEIGHT EXPAND", String.valueOf(mBottomSheetBehavior.getPeekHeight()));
-                   mBottomSheetBehavior.setPeekHeight(200);
-               }else{
-                   mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                   Log.e("PEEK HEIGHT COLLAPSE", String.valueOf(mBottomSheetBehavior.getPeekHeight()));
-                    mBottomSheetBehavior.setPeekHeight(0);
-               }
-                Log.e("AFTER HEIGHT", String.valueOf(String.valueOf(mBottomSheetBehavior.getPeekHeight())));
+                centerMarker(currentMarker);
 
+                if(mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    mBottomSheetBehavior.setPeekHeight(350);
+                }
 
                 return  true;
             }
         });
     }
 
+    public void centerMarker(Marker marker){
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(marker.getPosition().latitude, marker.getPosition().longitude))
+                .zoom(15)
+                .bearing(0)
+                .tilt(45)
+                .build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
