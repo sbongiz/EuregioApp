@@ -54,6 +54,7 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         EsercenteViewHolder holder;
         View view = convertView;
 
+        try{
         if (convertView == null) {
             holder = new EsercenteViewHolder();
             view = inflater.inflate(R.layout.esercente_item, null);
@@ -68,27 +69,17 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
             holder = (EsercenteViewHolder) view.getTag();
         }
         holder.title.setText(listOfEsercenti.get(position).getLesson());
-        try {
+
             holder.start.setText(listOfEsercenti.get(position).getStartLesson());
             holder.finish.setText(listOfEsercenti.get(position).getEndLesson());
+
+        holder.room.setText(listOfEsercenti.get(position).getRoom());
+            
+
+        holder.room.setOnClickListener(this);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        holder.room.setText(listOfEsercenti.get(position).getRoom());
-
-
-        String tmp = listOfEsercenti.get(position).getRoom();
-        if(tmp.contains("Aula ")){
-            holder.roomPreview.setText(tmp.replace("Aula ",""));
-        }else if (tmp.contains("LD")){
-            holder.roomPreview.setText(tmp.replace("LD",""));
-        }else if (tmp.contains("spazio")){
-            holder.roomPreview.setText(tmp.replace("Aula ","").replace("(spazio polifunzionale)",""));
-        }
-
-
-        holder.room.setOnClickListener(this);
 
         return view;
     }

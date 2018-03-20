@@ -37,9 +37,7 @@ public class Esercente implements Serializable {
     }
 
     public String getStartLesson() throws ParseException {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        Date date = format.parse(startLesson);
-        return new SimpleDateFormat("HH:mm").format(date);
+        return this.startLesson;
     }
 
     public void setStartLesson(String startLesson) {
@@ -47,9 +45,7 @@ public class Esercente implements Serializable {
     }
 
     public String getEndLesson() throws ParseException {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        Date date = format.parse(endLesson);
-        return new SimpleDateFormat("HH:mm").format(date);
+       return this.endLesson;
     }
 
 

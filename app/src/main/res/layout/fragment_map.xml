@@ -1,16 +1,41 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.almaviva.euregio.fragment.MapFragment">
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <fragment
-        android:id="@+id/map_view"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="@dimen/bottom_navigation_height"
-        android:layout_marginTop="@dimen/bottom_navigation_height" />
-</FrameLayout>
+        tools:context="com.almaviva.euregio.fragment.MapFragment">
+
+        <!-- TODO: Update blank fragment layout -->
+
+
+        <fragment
+            android:id="@+id/map_view"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+   <!-- <android.support.v4.widget.NestedScrollView
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="@android:dimen/thumbnail_width"
+        android:background="@android:color/holo_orange_light"
+        android:clipToPadding="false"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="TESTO di prova bottom sheet"
+            android:textSize="16sp" />
+
+    </android.support.v4.widget.NestedScrollView> -->
+    <include layout="@layout/bottom_sheet"
+        android:layout_height="match_parent" />
+
+</android.support.design.widget.CoordinatorLayout>

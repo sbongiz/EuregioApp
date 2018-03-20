@@ -42,33 +42,28 @@ public class ListaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_lista, container, false);
+        View view = inflater.inflate(R.layout.fragment_lista, container, false);
         try {
             esercentiList = view.findViewById(R.id.esercenti_list);
             esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Esercente>());
-             esercentiList.setAdapter(esercenteListAdapter);
-             getEsercenti();
+            esercentiList.setAdapter(esercenteListAdapter);
+            getEsercenti();
+
+
+            esercentiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    //        Esercente lesson = (Esercente) esercenteListAdapter.getItem(position);
+
+                    //  Intent intent = new Intent();
+                    //  intent.putExtra("SelectedLesson",lesson);
+                    //  setResult(Activity.RESULT_OK, intent);
+
+                    //  finish();
+                }
+            });
         } catch (Exception e) {
-            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
-        }
-
-
-
-        try{
-        esercentiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                //        Esercente lesson = (Esercente) esercenteListAdapter.getItem(position);
-
-                //  Intent intent = new Intent();
-                //  intent.putExtra("SelectedLesson",lesson);
-                //  setResult(Activity.RESULT_OK, intent);
-
-                //  finish();
-            }
-        });
-        }catch (Exception e){
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
         return view;
@@ -104,17 +99,21 @@ public class ListaFragment extends Fragment {
         mListener = null;
     }
 
-   public void getEsercenti() throws ParseException {
-       esercentiArrayList = new ArrayList<Esercente>();
-       for (int x = 0; x < 6; x++) {
-           Esercente eser = new Esercente("Lesson" + x, "start " + x, "end " + x, "room" + x);
-           esercentiArrayList.add(eser);
+    public void getEsercenti() throws ParseException {
+        try {
+            esercentiArrayList = new ArrayList<Esercente>();
+            for (int x = 0; x < 6; x++) {
+                Esercente eser = new Esercente("Lesson" + x, "start " + x, "end " + x, "room" + x);
+                esercentiArrayList.add(eser);
 
-           esercenteListAdapter.add(esercentiArrayList);
-           esercenteListAdapter.notifyDataSetChanged();
-       }
-       Log.d("LISTA",esercentiArrayList.toString());
-   }
+                esercenteListAdapter.add(esercentiArrayList);
+                esercenteListAdapter.notifyDataSetChanged();
+            }
+            Log.d("LISTA", esercentiArrayList.toString());
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+    }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
