@@ -60,37 +60,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mBottomSheetBehavior.setPeekHeight(350);
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-            mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-                @Override
-                public void onStateChanged(View bottomSheet, int newState) {
-
-                   // if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-
-                   //     Log.e("STATE CHANGE","STATE COLLAPSED");
-                   // }
-                   // if (newState == BottomSheetBehavior.STATE_DRAGGING){
-                   //     Log.e("STATE CHANGE", "STATE DRAGGING");
-                   // }
-                   // if(newState == BottomSheetBehavior.STATE_EXPANDED){
-                   //     Log.e("STATE CHANGE", "STATE EXPANDED");
-                   // }
-                   // if(newState == BottomSheetBehavior.STATE_HIDDEN){
-                   //     Log.e("STATE CHANGE", "STATE HIDDEN");
-
-                   // }
-                   // if(newState == BottomSheetBehavior.STATE_SETTLING){
-                   //    Log.e("STATE CHANGE", "STATE SETTLING");
-                   // }
-                   // if(newState == BottomSheetBehavior.PEEK_HEIGHT_AUTO){
-                   //     Log.e("STATE CHANGE", "STATE HEIGHT AUTO");
-                   // }
-                }
-                @Override
-                public void onSlide(View bottomSheet, float slideOffset) {
-
-                }
-            });
-
 
             bottomSheet.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -134,6 +103,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
 
+
+        
+
         return view;
     }
 
@@ -169,6 +141,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         LatLng lavis = new LatLng(46.14, 11.10);
         googleMap.addMarker(new MarkerOptions().position(lavis).title("Marker in Lavis"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(lavis));
+        setCenterOfMap();
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -190,6 +163,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(marker.getPosition().latitude, marker.getPosition().longitude))
                 .zoom(15)
+                .bearing(0)
+                .tilt(45)
+                .build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+    public void setCenterOfMap(){
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(46.673211,11.428050)) //Alto Adige center
+                .zoom(8)
                 .bearing(0)
                 .tilt(45)
                 .build();
