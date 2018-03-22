@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableLayout;
 
 import com.almaviva.euregio.R;
 import com.almaviva.euregio.pager.SwipePagerAdapter;

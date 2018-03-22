@@ -2,11 +2,14 @@ package com.almaviva.euregio.fragment;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -38,6 +41,7 @@ public class ListaFragment extends Fragment {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,8 +52,6 @@ public class ListaFragment extends Fragment {
             esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Esercente>());
             esercentiList.setAdapter(esercenteListAdapter);
             getEsercenti();
-
-
             esercentiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -110,7 +112,7 @@ public class ListaFragment extends Fragment {
                 esercenteListAdapter.notifyDataSetChanged();
             }
             Log.d("LISTA", esercentiArrayList.toString());
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
     }

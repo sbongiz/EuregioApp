@@ -5,18 +5,20 @@
     android:layout_height="match_parent">
 
     <FrameLayout
+        android:id="@+id/map_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/bottom_navigation_height"
+        android:layout_marginTop="@dimen/bottom_navigation_height"
         tools:context="com.almaviva.euregio.fragment.MapFragment">
-
-        <!-- TODO: Update blank fragment layout -->
 
 
         <fragment
             android:id="@+id/map_view"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_gravity="fill" />
 
     </FrameLayout>
 
@@ -35,7 +37,6 @@
             android:textSize="16sp" />
 
     </android.support.v4.widget.NestedScrollView> -->
-    <include layout="@layout/bottom_sheet"
-        android:layout_height="match_parent" />
+    <include layout="@layout/bottom_sheet"/>
 
 </android.support.design.widget.CoordinatorLayout>
