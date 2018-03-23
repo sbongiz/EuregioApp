@@ -33,9 +33,10 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
     private BottomNavigationView bottomNavigation;
     private NoSwipePager viewPager;
     private BottomBarAdapter pagerAdapter;
-    private VantaggiFragment vantaggiFragment;
+    private ListaFragment listaFragment;
     private EuregioFragment euregioFragment;
     private ImpostazioniFragment impostazioniFragment;
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +49,10 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
             setComponent();
 
             viewPager.setPagingEnabled(false);
-            pagerAdapter.addFragments(vantaggiFragment);
+            pagerAdapter.addFragments(listaFragment);
             pagerAdapter.addFragments(euregioFragment);
             pagerAdapter.addFragments(impostazioniFragment);
+            pagerAdapter.addFragments(mapFragment);
 
             viewPager.setAdapter(pagerAdapter);
 
@@ -83,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
                     }
                     if(id == R.id.navigation_impostazioni){
                         viewPager.setCurrentItem(2);
+                    }
+                    if(id == R.id.navigation_mappa){
+                        viewPager.setCurrentItem(3);
                     }
                     return true;
                 }
@@ -117,9 +122,10 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
     }
 
     private void setFragment() {
-        vantaggiFragment = new VantaggiFragment();
+        listaFragment = new ListaFragment();
         euregioFragment = new EuregioFragment();
         impostazioniFragment = new ImpostazioniFragment();
+        mapFragment = new MapFragment();
     }
 
   // private void createNavigationButton() {

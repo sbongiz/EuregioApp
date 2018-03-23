@@ -73,9 +73,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
 
-            parentFragment = (VantaggiFragment) this.getParentFragment();
+           // parentFragment = (VantaggiFragment) this.getParentFragment();
 
-            tab = parentFragment.getView().findViewById(R.id.tab_layout);
+            //tab = parentFragment.getView().findViewById(R.id.tab_layout);
             frame = view.findViewById(R.id.map_frame);
 
             //region BOTTOM SHEET LISTENER

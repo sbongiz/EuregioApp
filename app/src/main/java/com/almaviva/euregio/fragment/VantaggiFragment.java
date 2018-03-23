@@ -22,9 +22,9 @@ public class VantaggiFragment extends Fragment {
 
 
     private OnFragmentInteractionListener mListener;
-    private ViewPager viewPager;
-    private PagerAdapter pagerAdapter;
-    private TabLayout tabLayout;
+    //private ViewPager viewPager;
+    //private PagerAdapter pagerAdapter;
+    //private TabLayout tabLayout;
 
     public VantaggiFragment() {
         // Required empty public constructor
@@ -51,28 +51,28 @@ public class VantaggiFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 
         setComponent();
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                try {
-                    viewPager.setCurrentItem(tab.getPosition());
+        //viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        //tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+         //  @Override
+         //  public void onTabSelected(TabLayout.Tab tab) {
+         //      try {
+         //          viewPager.setCurrentItem(tab.getPosition());
 
-                }catch (Exception e){
-                    Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
-                }
-            }
+         //      }catch (Exception e){
+         //          Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+         //      }
+         //  }
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+         //  @Override
+         //  public void onTabUnselected(TabLayout.Tab tab) {
 
-            }
+         //  }
 
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+         //  @Override
+         //  public void onTabReselected(TabLayout.Tab tab) {
 
-            }
-        });
+         //  }
+       // });
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -103,13 +103,13 @@ public class VantaggiFragment extends Fragment {
 
     public void setComponent(){
         try {
-            tabLayout = getView().findViewById(R.id.tab_layout);
-            tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tab_lista)));
-            tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tab_mappa)));
-            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-            viewPager = getView().findViewById(R.id.view_pager);
-            pagerAdapter = new SwipePagerAdapter(getChildFragmentManager(), tabLayout.getTabCount());
-            viewPager.setAdapter(pagerAdapter);
+            //tabLayout = getView().findViewById(R.id.tab_layout);
+           // tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tab_lista)));
+            //tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.tab_mappa)));
+            //tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+            //viewPager = getView().findViewById(R.id.view_pager);
+            //pagerAdapter = new SwipePagerAdapter(getChildFragmentManager(), tabLayout.getTabCount());
+            //viewPager.setAdapter(pagerAdapter);
         }catch(Exception e){
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
