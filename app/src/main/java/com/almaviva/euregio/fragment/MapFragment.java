@@ -1,7 +1,12 @@
 package com.almaviva.euregio.fragment;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,20 +16,26 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+
 
 import com.almaviva.euregio.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -36,7 +47,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private OnFragmentInteractionListener mListener;
-    private MapView mapView;
     private BottomSheetBehavior mBottomSheetBehavior;
     private View bottomSheet;
     private Marker currentMarker = null;
@@ -45,6 +55,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private FrameLayout frame;
     private boolean isDetailCentered = false;
     private boolean onMarkerClick = false;
+    private ActionBar actionBar;
+    private Toolbar toolBar;
     GoogleMap googleMap;
 
     public MapFragment() {
@@ -53,16 +65,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
         try {
+
             SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                     .findFragmentById(R.id.map_view);
             mapFragment.getMapAsync(this);
@@ -73,10 +90,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
 
-           // parentFragment = (VantaggiFragment) this.getParentFragment();
-
-            //tab = parentFragment.getView().findViewById(R.id.tab_layout);
-            frame = view.findViewById(R.id.map_frame);
+            frame = (FrameLayout) view.findViewById(R.id.map_frame);
+            setHasOptionsMenu(true);
+            toolBar = (Toolbar) getActivity().findViewById(R.id.toolbar);
 
             //region BOTTOM SHEET LISTENER
 
@@ -123,8 +139,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                CoordinatorLayout.LayoutParams lp = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.MATCH_PARENT);
                if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                   // lp.setMargins(0,0,0,convertDpIntoPx(56));
-                   // frame.setLayoutParams(lp);
                } else if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                }
@@ -158,6 +172,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return view;
 }
 
+
+
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -187,8 +204,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap = mappa;
 
         // Add a marker in Sydney and move the camera
-        LatLng lavis = new LatLng(46.14, 11.10);
+        LatLng lavis = new LatLng(46.497641, 11.355022);
+        LatLng lavis1 = new LatLng(46.498118, 11.355330);
+        LatLng lavis2 = new LatLng(46.498162, 11.354413);
+        LatLng lavis3 = new LatLng(46.498609, 11.354370);
+        LatLng lavis4 = new LatLng(46.498565, 11.355169);
+        LatLng lavis5 = new LatLng(46.498255, 11.354762);
+
         googleMap.addMarker(new MarkerOptions().position(lavis).title("Marker in Lavis"));
+        googleMap.addMarker(new MarkerOptions().position(lavis1).title("Marker in Lavis1"));
+        googleMap.addMarker(new MarkerOptions().position(lavis2).title("Marker in Lavis2"));
+        googleMap.addMarker(new MarkerOptions().position(lavis3).title("Marker in Lavis3"));
+        googleMap.addMarker(new MarkerOptions().position(lavis4).title("Marker in Lavis4"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(lavis));
         setCenterOfMap();
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -251,11 +278,102 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
-public interface OnFragmentInteractionListener {
+
+
+    public interface OnFragmentInteractionListener {
     // TODO: Update argument type and name
     void onFragmentInteraction(Uri uri);
 
 }
+
+   @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.search, menu);
+        SearchManager searchManager =
+                (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+       MenuItem mSearchMenuItem = menu.findItem(R.id.searchView);
+       final SearchView searchView =(SearchView) menu.findItem(R.id.searchView).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getActivity().getComponentName()));
+
+
+        actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar() ;
+
+        final MenuItem searchMenuItem = menu.findItem(R.id.searchView);
+
+        final MenuItem filter = menu.findItem(R.id.filter);
+
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Log.d("TAG", "Collapsed");
+
+                actionBar.setBackgroundDrawable(new ColorDrawable(0xFFd32f2f));
+                return true;
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                Log.d("TAG", "Expanded");
+
+                //getActivity().setTheme(R.style.SearchTheme);
+                //actionBar.getna .getNavigationIcon().setColorFilter(getResources().getColor(R.color.blue_gray_15), PorterDuff.Mode.SRC_ATOP);
+                ImageView searchClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+                searchClose.setImageResource(R.drawable.icon_remove);
+
+
+                actionBar.setBackgroundDrawable(new ColorDrawable(0xFFFFFFFF));
+
+                return true;
+            }
+        });
+
+
+
+
+       //toolBar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.yellow), PorterDuff.Mode.SRC_ATOP);
+
+      //MenuItem filter = menu.findItem(R.id.filter);
+      //MenuItemCompat.setActionView(filter,R.layout.badge);
+      //RelativeLayout notifCount = (RelativeLayout) MenuItemCompat.getActionView(filter);
+
+      //TextView tv = (TextView) notifCount.findViewById(R.id.actionbar_notifcation_textview);
+      //tv.setText("12");
+
+       // View searchPlate = (View) searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+       // if (searchPlate!=null) {
+       //     TextView searchText = (TextView) searchPlate.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+       //     if (searchText!=null) {
+       //         searchText.setTextColor(Color.BLACK);
+       //         searchText.setHintTextColor(Color.BLACK);
+       //     }
+       // }
+
+
+        //EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        //searchEditText.setTextColor(Color.RED);
+        //searchEditText.setHintTextColor(Color.RED);
+        //searchEditText.setBackgroundColor(Color.WHITE);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+
+                return true;
+
+            }
+
+        });
+    }
+
 
     public int convertDpIntoPx(int dpMeasure) {
         Resources r = getResources();
@@ -266,4 +384,6 @@ public interface OnFragmentInteractionListener {
         );
         return px;
     }
+
+
 }

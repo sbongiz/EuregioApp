@@ -1,7 +1,6 @@
 package com.almaviva.euregio.fragment;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import com.almaviva.euregio.R;
@@ -51,13 +49,13 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
         }
 
         try {
-            image = view.findViewById(R.id.card_image);
+            image = (ImageView) view.findViewById(R.id.card_image);
             toMiddle = AnimationUtils.loadAnimation(getActivity(),R.anim.to_middle);
             fromMiddle = AnimationUtils.loadAnimation(getActivity(),R.anim.from_middle);
             toMiddle.setAnimationListener(this);
             fromMiddle.setAnimationListener(this);
             image.setRotation(-90);
-            FloatingActionButton fab = view.findViewById(R.id.fab);
+            FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

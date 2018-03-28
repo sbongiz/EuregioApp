@@ -3,22 +3,21 @@
 
     <item
         android:id="@+id/navigation_vantaggi"
-        android:icon="@drawable/ic_home_black_24dp"
+        android:icon="@drawable/icon_vantaggi"
         android:title="@string/title_vantaggi" />
+    <item
+        android:id="@+id/navigation_mappa"
+        android:icon="@drawable/icon_map"
+        android:title="@string/title_mappa" />
 
     <item
         android:id="@+id/navigation_euregio"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:icon="@drawable/icon_euregio"
         android:title="@string/title_euregio" />
 
     <item
         android:id="@+id/navigation_impostazioni"
-        android:icon="@drawable/ic_notifications_black_24dp"
+        android:icon="@drawable/icon_impostazioni"
         android:title="@string/title_impostazioni" />
-
-    <item
-        android:id="@+id/navigation_mappa"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/title_mappa" />
 
 </menu>

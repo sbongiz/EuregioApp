@@ -48,7 +48,7 @@ public class ListaFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_lista, container, false);
         try {
-            esercentiList = view.findViewById(R.id.esercenti_list);
+            esercentiList = (ListView) view.findViewById(R.id.esercenti_list);
             esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Esercente>());
             esercentiList.setAdapter(esercenteListAdapter);
             getEsercenti();

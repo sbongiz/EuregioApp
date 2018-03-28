@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">Euregio</string>
+    <string name="app_name">EuregioFamilyPass</string>
     <string name="title_vantaggi">Vantaggi</string>
-    <string name="title_euregio">Euregio</string>
+    <string name="title_euregio">EuregioFamilyPass</string>
     <string name="title_impostazioni">Impostazioni</string>
     <string name="tab_lista">Lista</string>
     <string name="title_mappa">Mappa</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_search">Ricerca</string>
+    <string name="hint_search">ricerca...</string>
 </resources>

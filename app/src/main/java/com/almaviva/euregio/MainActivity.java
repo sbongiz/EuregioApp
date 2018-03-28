@@ -1,6 +1,9 @@
 package com.almaviva.euregio;
 
 import android.app.ActionBar;
+import android.app.SearchManager;
+import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,7 +11,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -19,8 +26,6 @@ import com.almaviva.euregio.fragment.ListaFragment;
 import com.almaviva.euregio.fragment.MapFragment;
 import com.almaviva.euregio.fragment.VantaggiFragment;
 import com.almaviva.euregio.pager.NoSwipePager;
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 
 public class MainActivity extends AppCompatActivity implements  VantaggiFragment.OnFragmentInteractionListener,
                                                                 EuregioFragment.OnFragmentInteractionListener,
@@ -38,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
     private ImpostazioniFragment impostazioniFragment;
     private MapFragment mapFragment;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,9 +58,9 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
 
             viewPager.setPagingEnabled(false);
             pagerAdapter.addFragments(listaFragment);
+            pagerAdapter.addFragments(mapFragment);
             pagerAdapter.addFragments(euregioFragment);
             pagerAdapter.addFragments(impostazioniFragment);
-            pagerAdapter.addFragments(mapFragment);
 
             viewPager.setAdapter(pagerAdapter);
 
@@ -80,15 +88,16 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
                     if(id == R.id.navigation_vantaggi){
                     viewPager.setCurrentItem(0);
                     }
-                    if(id == R.id.navigation_euregio){
+                    if(id == R.id.navigation_mappa){
                         viewPager.setCurrentItem(1);
                     }
-                    if(id == R.id.navigation_impostazioni){
+                    if(id == R.id.navigation_euregio){
                         viewPager.setCurrentItem(2);
                     }
-                    if(id == R.id.navigation_mappa){
+                    if(id == R.id.navigation_impostazioni){
                         viewPager.setCurrentItem(3);
                     }
+
                     return true;
                 }
             });
@@ -119,6 +128,10 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
         bottomNavigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         mTextMessage = (TextView) findViewById(R.id.textView);
         viewPager = (NoSwipePager) findViewById(R.id.pager);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(0xFFFFFFFF);
+
+        setSupportActionBar(toolbar);
     }
 
     private void setFragment() {
@@ -127,6 +140,8 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
         impostazioniFragment = new ImpostazioniFragment();
         mapFragment = new MapFragment();
     }
+
+
 
   // private void createNavigationButton() {
 
@@ -152,5 +167,6 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
 
 
     //endregion
+
 
 }
