@@ -1,23 +1,14 @@
 package com.almaviva.euregio;
 
-import android.app.ActionBar;
-import android.app.SearchManager;
-import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.almaviva.euregio.adapter.BottomBarAdapter;
 import com.almaviva.euregio.fragment.EuregioFragment;
@@ -34,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
                                                                 MapFragment.OnFragmentInteractionListener{
 
 
-    private TextView mTextMessage;
     private BottomNavigationView bottomNavigation;
     private NoSwipePager viewPager;
     private BottomBarAdapter pagerAdapter;
@@ -126,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
 
     private void findComponentInView() {
         bottomNavigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-        mTextMessage = (TextView) findViewById(R.id.textView);
         viewPager = (NoSwipePager) findViewById(R.id.pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(0xFFFFFFFF);
@@ -162,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
     //region LISTENER
     @Override
     public void onFragmentInteraction(Uri uri) {
-        String mtva = "";
     }
 
 
