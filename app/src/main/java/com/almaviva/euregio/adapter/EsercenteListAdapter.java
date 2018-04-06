@@ -38,6 +38,7 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
 
     public EsercenteListAdapter(Context context, ArrayList<Supplier> listOfEsercenti) {
         this.listOfEsercenti = listOfEsercenti;
+        this.context = context;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 

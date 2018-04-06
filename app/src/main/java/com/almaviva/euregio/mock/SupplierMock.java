@@ -59,6 +59,7 @@ public class SupplierMock {
 
         loc.properties = locationProperties;
 
+        sup.properties.location = loc;
 
         Category cat = new Category();
         CategoryProperties categoryProperties = new CategoryProperties();
@@ -66,6 +67,10 @@ public class SupplierMock {
         categoryProperties.id = 1;
         categoryProperties.name = "Commerciante";
         cat.properties = categoryProperties;
+
+        ArrayList<Category> categoryList= new ArrayList<Category>();
+        categoryList.add(cat);
+        sup.properties.categories = categoryList;
 
         ArrayList<Agreement> vantaggiArrayList = new ArrayList<Agreement>();
 
@@ -115,6 +120,7 @@ public class SupplierMock {
 
         loc2.properties = locationProperties2;
 
+        sup2.properties.location = loc2;
 
         Category cat2 = new Category();
         CategoryProperties categoryProperties2 = new CategoryProperties();
@@ -122,6 +128,10 @@ public class SupplierMock {
         categoryProperties2.id = 1;
         categoryProperties2.name = "Commerciante";
         cat2.properties = categoryProperties2;
+
+        ArrayList<Category> categoryList2= new ArrayList<Category>();
+        categoryList.add(cat2);
+        sup2.properties.categories = categoryList2;
 
         ArrayList<Agreement> vantaggiArrayList2 = new ArrayList<Agreement>();
 
