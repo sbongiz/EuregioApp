@@ -4,15 +4,19 @@ package com.almaviva.euregio.adapter;
  * Created by a.sciarretta on 16/03/2018.
  */
 
+import android.app.Application;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.almaviva.euregio.R;
+import com.almaviva.euregio.model.Agreement;
 import com.almaviva.euregio.model.Esercente;
+import com.almaviva.euregio.model.Supplier;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -25,10 +29,14 @@ import java.util.List;
 
 public class EsercenteListAdapter extends BaseAdapter implements View.OnClickListener {
 
-    private ArrayList<Esercente> listOfEsercenti;
+    private ArrayList<Supplier> listOfEsercenti;
     private LayoutInflater inflater;
 
-    public EsercenteListAdapter(Context context, ArrayList<Esercente> listOfEsercenti) {
+    private Context context;
+    private ArrayList<Agreement> vantaggiArrayList;
+    private VantaggiListAdapter vantaggiListAdapter;
+
+    public EsercenteListAdapter(Context context, ArrayList<Supplier> listOfEsercenti) {
         this.listOfEsercenti = listOfEsercenti;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -54,32 +62,30 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         EsercenteViewHolder holder;
         View view = convertView;
 
-        try{
         if (convertView == null) {
             holder = new EsercenteViewHolder();
             view = inflater.inflate(R.layout.esercente_item, null);
 
             holder.title = (TextView) view.findViewById(R.id.title);
-            holder.start = (TextView) view.findViewById(R.id.start);
-            holder.finish = (TextView) view.findViewById(R.id.finish);
-            holder.room = (TextView) view.findViewById(R.id.room);
-            holder.roomPreview = (TextView) view.findViewById(R.id.roomPreview);
+            holder.data = (TextView) view.findViewById(R.id.data);
+            holder.indirizzo = (TextView) view.findViewById(R.id.indirizzo);
+            holder.vantaggiList = (ListView) view.findViewById(R.id.lista_vantaggi);
             view.setTag(holder);
         } else {
             holder = (EsercenteViewHolder) view.getTag();
         }
-        holder.title.setText(listOfEsercenti.get(position).getLesson());
 
-            holder.start.setText(listOfEsercenti.get(position).getStartLesson());
-            holder.finish.setText(listOfEsercenti.get(position).getEndLesson());
 
-        holder.room.setText(listOfEsercenti.get(position).getRoom());
-            
+        holder.title.setText(listOfEsercenti.get(position).getTitle());
+        holder.data.setText(listOfEsercenti.get(position).getDate());
+        holder.indirizzo.setText(listOfEsercenti.get(position).getIndirizzo());
 
-        holder.room.setOnClickListener(this);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        vantaggiListAdapter = new VantaggiListAdapter(context,new ArrayList<Agreement>());
+        holder.vantaggiList.setAdapter(vantaggiListAdapter);
+
+        vantaggiArrayList = listOfEsercenti.get(position).getListaVantaggi();
+        vantaggiListAdapter.add(vantaggiArrayList);
+        vantaggiListAdapter.notifyDataSetChanged();
 
         return view;
     }
@@ -91,21 +97,18 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
 
         if(resource == R.id.title) {
 
-        } else if(resource == R.id.room) {
-
         }
 
     }
 
-    public void add(List<Esercente> esercenti) {
+    public void add(List<Supplier> esercenti) {
         listOfEsercenti = new ArrayList<>(esercenti);
     }
 
     static class EsercenteViewHolder  {
         TextView title;
-        TextView start;
-        TextView finish;
-        TextView room;
-        TextView roomPreview;
+        TextView indirizzo;
+        TextView data;
+        ListView vantaggiList;
     }
 }

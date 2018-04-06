@@ -1,6 +1,5 @@
 package com.almaviva.euregio.fragment;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;

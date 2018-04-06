@@ -5,12 +5,7 @@ package com.almaviva.euregio.model;
  */
 
 public class District {
-    private String description;
-    private DistrictProperties properties;
-
-    private class DistrictProperties{
-        private int id;
-        private String name;
-    }
+    public String description;
+    public DistrictProperties properties;
 }
 

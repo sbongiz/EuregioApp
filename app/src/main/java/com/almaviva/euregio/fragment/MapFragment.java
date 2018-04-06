@@ -6,9 +6,9 @@ import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.almaviva.euregio.R;
 
+import com.almaviva.euregio.behavior.AnchorBottomSheetBehavior;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,7 +42,7 @@ import java.lang.reflect.Field;
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private OnFragmentInteractionListener mListener;
-    private BottomSheetBehavior mBottomSheetBehavior;
+    private AnchorBottomSheetBehavior mBottomSheetBehavior;
     private View bottomSheet;
     private Marker currentMarker = null;
     private boolean onMarkerClick = false;
@@ -49,7 +50,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private SupportMapFragment mapFragment;
     private SearchManager searchManager;
     private SearchView searchView;
-    private MenuItem searchMenuItem;
     private MenuItem filter;
     private TextView badgeTextView;
     private ImageView searchClose;
@@ -82,24 +82,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             mapFragment.getMapAsync(this);
 
-            mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+            mBottomSheetBehavior = AnchorBottomSheetBehavior.from(bottomSheet);
             mBottomSheetBehavior.setPeekHeight(350);
-            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_HIDDEN);
 
             setHasOptionsMenu(true);
 
             //region BOTTOM SHEET LISTENER
-            mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            mBottomSheetBehavior.setBottomSheetCallback(new AnchorBottomSheetBehavior.BottomSheetCallback() {
                 @Override
                 public void onStateChanged(@NonNull View bottomSheet, int newState) {
 
-                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    if (newState == AnchorBottomSheetBehavior.STATE_EXPANDED) {
                         centerMarkerDetail(currentMarker, true);
                     }
-                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    if (newState == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
                         if (!onMarkerClick) {
                             centerMarkerDetail(currentMarker, false);
                         }
+                    }
+                    if(newState == AnchorBottomSheetBehavior.STATE_ANCHOR_POINT){
+                        Log.e("ANCHOR","POINT");
                     }
                     onMarkerClick = false;
                 }
@@ -120,10 +123,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             bottomSheet.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                    } else if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    if (mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
+                        mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_EXPANDED);
+                    } else if (mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_EXPANDED) {
+                        mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_COLLAPSED);
                     }
                 }
             });
@@ -175,7 +178,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
             searchView = (SearchView) menu.findItem(R.id.searchView).getActionView();
             toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-            searchMenuItem = menu.findItem(R.id.searchView);
             filter = menu.findItem(R.id.filter);
             FrameLayout notifCount = (FrameLayout) MenuItemCompat.getActionView(filter);
             badgeTextView = (TextView) notifCount.findViewById(R.id.actionbar_notifcation_textview);
@@ -211,9 +213,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 currentMarker = marker;
                 centerMarker(currentMarker);
 
-                if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN || mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                if (mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_HIDDEN || mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_EXPANDED) {
                     onMarkerClick = true;
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_COLLAPSED);
                     mBottomSheetBehavior.setPeekHeight(350);
                 }
                 return true;
@@ -274,7 +276,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         customizeSearchView();
 
         //region MENU LISTENER
-        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+        final SupportMenuItem menuNonCompat = (SupportMenuItem) menu.findItem(R.id.searchView);
+
+
+        menuNonCompat.setSupportOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 Log.d("TAG", "Collapsed");

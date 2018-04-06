@@ -17,7 +17,11 @@ import android.widget.ListView;
 
 import com.almaviva.euregio.R;
 import com.almaviva.euregio.adapter.EsercenteListAdapter;
+import com.almaviva.euregio.adapter.VantaggiListAdapter;
+import com.almaviva.euregio.mock.SupplierMock;
+import com.almaviva.euregio.model.Agreement;
 import com.almaviva.euregio.model.Esercente;
+import com.almaviva.euregio.model.Supplier;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -28,7 +32,8 @@ public class ListaFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private ListView esercentiList;
     private EsercenteListAdapter esercenteListAdapter;
-    private ArrayList<Esercente> esercentiArrayList;
+    private ArrayList<Supplier> esercentiArrayList;
+
 
     public ListaFragment() {
         // Required empty public constructor
@@ -49,8 +54,10 @@ public class ListaFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_lista, container, false);
         try {
             esercentiList = (ListView) view.findViewById(R.id.esercenti_list);
-            esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Esercente>());
+            esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Supplier>());
+
             esercentiList.setAdapter(esercenteListAdapter);
+            //
             getEsercenti();
             esercentiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -102,20 +109,22 @@ public class ListaFragment extends Fragment {
     }
 
     public void getEsercenti() throws ParseException {
-        try {
-            esercentiArrayList = new ArrayList<Esercente>();
-            for (int x = 0; x < 6; x++) {
-                Esercente eser = new Esercente("Lesson" + x, "start " + x, "end " + x, "room" + x);
-                esercentiArrayList.add(eser);
 
-                esercenteListAdapter.add(esercentiArrayList);
-                esercenteListAdapter.notifyDataSetChanged();
-            }
+
+        try {
+            esercentiArrayList = new ArrayList<Supplier>();
+
+            esercentiArrayList = SupplierMock.getListMock();
+            esercenteListAdapter.add(esercentiArrayList);
+            esercenteListAdapter.notifyDataSetChanged();
+
             Log.d("LISTA", esercentiArrayList.toString());
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
     }
+
+
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
