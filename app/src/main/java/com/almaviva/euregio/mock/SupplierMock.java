@@ -36,7 +36,7 @@ public class SupplierMock {
         sup.properties.phone = "0000000001";
         sup.properties.email = "standSpeck@mail.it";
         sup.properties.web = "www.stendSpeck.it";
-        sup.properties.lastUpdate = "2017-12-26";
+        sup.properties.lastUpdate = "26-12";
 
         Location loc = new Location();
         LocationProperties locationProperties = new LocationProperties();
@@ -97,7 +97,7 @@ public class SupplierMock {
         sup2.properties.phone = "0000000002";
         sup2.properties.email = "uniCredit@mail.it";
         sup2.properties.web = "www.uniCredit.it";
-        sup2.properties.lastUpdate = "2017-08-20";
+        sup2.properties.lastUpdate = "20-08";
 
         Location loc2 = new Location();
         LocationProperties locationProperties2 = new LocationProperties();
@@ -135,7 +135,7 @@ public class SupplierMock {
 
         ArrayList<Agreement> vantaggiArrayList2 = new ArrayList<Agreement>();
 
-        for (int x = 0; x < 1; x++) {
+        for (int x = 0; x < 2; x++) {
             Agreement vant = new Agreement();
             AgreementProperties agreementProperties = new AgreementProperties();
             agreementProperties.id = x;

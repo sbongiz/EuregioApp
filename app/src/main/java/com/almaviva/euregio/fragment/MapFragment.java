@@ -94,10 +94,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 public void onStateChanged(@NonNull View bottomSheet, int newState) {
 
                     if (newState == AnchorBottomSheetBehavior.STATE_EXPANDED) {
+                        Log.e("EXP","ANDED");
                         centerMarkerDetail(currentMarker, true);
                     }
                     if (newState == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
+                        Log.e("COLL","APSED");
                         if (!onMarkerClick) {
+
                             centerMarkerDetail(currentMarker, false);
                         }
                     }

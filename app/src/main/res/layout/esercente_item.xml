@@ -38,18 +38,18 @@
 
                 <TextView
                     android:id="@+id/title"
-                    android:layout_width="313dp"
+                    android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
                     android:text="titolo"
-                    android:textAppearance="@android:style/TextAppearance.Holo.Small" />
+                    android:textAppearance="@android:style/TextAppearance.Holo.Small"
+                    android:textColor="@color/principalText" />
 
                 <TextView
                     android:id="@+id/data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:text="data" />
             </LinearLayout>
 
@@ -60,16 +60,13 @@
                 android:text="indirizzo" />
 
             <LinearLayout
+                android:id="@+id/vantaggi_linear_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:weightSum="1">
 
-                <ListView
-                    android:id="@+id/lista_vantaggi"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
             </LinearLayout>
 
         </LinearLayout>

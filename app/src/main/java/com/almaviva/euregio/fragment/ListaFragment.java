@@ -9,18 +9,15 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.almaviva.euregio.R;
 import com.almaviva.euregio.adapter.EsercenteListAdapter;
-import com.almaviva.euregio.adapter.VantaggiListAdapter;
 import com.almaviva.euregio.mock.SupplierMock;
-import com.almaviva.euregio.model.Agreement;
-import com.almaviva.euregio.model.Esercente;
 import com.almaviva.euregio.model.Supplier;
 
 import java.text.ParseException;
@@ -31,6 +28,7 @@ public class ListaFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ListView esercentiList;
+    private TextView textViewNumeroRisultati;
     private EsercenteListAdapter esercenteListAdapter;
     private ArrayList<Supplier> esercentiArrayList;
 
@@ -54,11 +52,14 @@ public class ListaFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_lista, container, false);
         try {
             esercentiList = (ListView) view.findViewById(R.id.esercenti_list);
+            textViewNumeroRisultati = (TextView) view.findViewById(R.id.textView_numero_risultati);
             esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Supplier>());
 
             esercentiList.setAdapter(esercenteListAdapter);
             //
             getEsercenti();
+
+            textViewNumeroRisultati.setText(esercentiArrayList.size() + " risultati");
             esercentiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

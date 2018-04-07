@@ -113,7 +113,7 @@ public class AnchorBottomSheetBehavior<V extends View> extends CoordinatorLayout
     private int mPeekHeightMin;
     int mMinOffset;
     int mMaxOffset;
-    private static final int DEFAULT_ANCHOR_POINT = 200;
+    private static final int DEFAULT_ANCHOR_POINT = 20;
     int mAnchorPoint;
     boolean mHideable;
     private boolean mSkipCollapsed;

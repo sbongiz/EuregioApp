@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,10 +32,8 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
 
     private ArrayList<Supplier> listOfEsercenti;
     private LayoutInflater inflater;
-
     private Context context;
-    private ArrayList<Agreement> vantaggiArrayList;
-    private VantaggiListAdapter vantaggiListAdapter;
+
 
     public EsercenteListAdapter(Context context, ArrayList<Supplier> listOfEsercenti) {
         this.listOfEsercenti = listOfEsercenti;
@@ -70,7 +69,8 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
             holder.title = (TextView) view.findViewById(R.id.title);
             holder.data = (TextView) view.findViewById(R.id.data);
             holder.indirizzo = (TextView) view.findViewById(R.id.indirizzo);
-            holder.vantaggiList = (ListView) view.findViewById(R.id.lista_vantaggi);
+            holder.linearLayoutVantaggi = (LinearLayout) view.findViewById(R.id.vantaggi_linear_layout);
+
             view.setTag(holder);
         } else {
             holder = (EsercenteViewHolder) view.getTag();
@@ -81,12 +81,19 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         holder.data.setText(listOfEsercenti.get(position).getDate());
         holder.indirizzo.setText(listOfEsercenti.get(position).getIndirizzo());
 
-        vantaggiListAdapter = new VantaggiListAdapter(context,new ArrayList<Agreement>());
-        holder.vantaggiList.setAdapter(vantaggiListAdapter);
+        LinearLayout a = new LinearLayout(context);
+        a.setOrientation(LinearLayout.VERTICAL);
 
-        vantaggiArrayList = listOfEsercenti.get(position).getListaVantaggi();
-        vantaggiListAdapter.add(vantaggiArrayList);
-        vantaggiListAdapter.notifyDataSetChanged();
+        for (Agreement vantaggio: listOfEsercenti.get(position).properties.agreements){
+        TextView textTmp = new TextView(context);
+            textTmp.setText(vantaggio.getDescriptionShort());
+            textTmp.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+        a.addView(textTmp);
+        }
+
+        holder.linearLayoutVantaggi.addView(a);
+
+
 
         return view;
     }
@@ -110,6 +117,7 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         TextView title;
         TextView indirizzo;
         TextView data;
-        ListView vantaggiList;
+        LinearLayout linearLayoutVantaggi;
+
     }
 }
