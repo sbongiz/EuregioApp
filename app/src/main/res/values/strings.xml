@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">EuregioFamilyPass</string>
     <string name="title_vantaggi">Vantaggi</string>
-    <string name="title_euregio">EuregioFamilyPass</string>
+    <string name="title_euregio">EuregioFamilyPass Alto Adige</string>
     <string name="title_impostazioni">Impostazioni</string>
     <string name="tab_lista">Lista</string>
     <string name="title_mappa">Mappa</string>
@@ -9,4 +9,14 @@
     <string name="title_activity_maps">Map</string>
     <string name="title_search">Ricerca</string>
     <string name="hint_search">ricerca...</string>
+    <string name="conferma_button">CONFERMA</string>
+    <string name="reset_button">RESET</string>
+    <string name="tutte">Tutte</string>
+    <string name="tutti">Tutti</string>
+    <string name="categoria">Categoria</string>
+    <string name="comprensorio">Comprensorio</string>
+    <string name="ordine">Ordine</string>
+    <string name="alfabetico">Alfabetico</string>
+    <string name="data_aggiornamento">Data di Aggiornamento</string>
+    <string name="risultati">Risultati</string>
 </resources>

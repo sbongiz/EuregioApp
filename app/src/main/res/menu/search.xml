@@ -14,8 +14,6 @@
         android:id="@+id/filter"
         android:icon="@drawable/icon_settingswhite"
         android:title="Filter"
-        app:actionLayout="@layout/badge"
         app:showAsAction="always"
-
         />
 </menu>

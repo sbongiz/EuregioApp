@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:layout_marginTop="@dimen/bottom_navigation_height"
         android:background="@drawable/backgroud_border"
         android:orientation="horizontal">
@@ -18,18 +18,28 @@
             android:id="@+id/textView_numero_risultati"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
+            android:layout_gravity="left"
+            android:gravity="left|center_vertical"
             android:paddingLeft="15dp"
             android:text="TextView"
             android:textColor="@color/greyText" />
 
-        <ImageView
-            android:id="@+id/imageView2"
+        <TextView
+            android:id="@+id/textView_filtro_ordine"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1.61"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingRight="30dp"
+            android:textColor="@color/greyText" />
+
+        <ImageView
+            android:id="@+id/iconFilterAlfabetico"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_weight="0.10"
-            app:srcCompat="@drawable/icon_impostazioni" />
+            app:srcCompat="@drawable/sort_giu" />
 
     </LinearLayout>
 
@@ -41,4 +51,4 @@
         android:layout_marginTop="106dp"
         android:layout_weight="1" />
 
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

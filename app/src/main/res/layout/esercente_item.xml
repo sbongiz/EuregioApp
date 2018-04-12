@@ -44,20 +44,23 @@
                     android:fontFamily="sans-serif"
                     android:text="titolo"
                     android:textAppearance="@android:style/TextAppearance.Holo.Small"
-                    android:textColor="@color/principalText" />
+                    android:textColor="@color/principalText"
+                    android:textSize="@dimen/elementiListaFontSize" />
 
                 <TextView
                     android:id="@+id/data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="data" />
+                    android:text="data"
+                    android:textSize="@dimen/elementiListaFontSize" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/indirizzo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="indirizzo" />
+                android:text="indirizzo"
+                android:textSize="@dimen/elementiListaFontSize" />
 
             <LinearLayout
                 android:id="@+id/vantaggi_linear_layout"

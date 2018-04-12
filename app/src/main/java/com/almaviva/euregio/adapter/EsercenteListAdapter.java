@@ -33,7 +33,7 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
     private ArrayList<Supplier> listOfEsercenti;
     private LayoutInflater inflater;
     private Context context;
-
+    private boolean isAlreadyInfated = false;
 
     public EsercenteListAdapter(Context context, ArrayList<Supplier> listOfEsercenti) {
         this.listOfEsercenti = listOfEsercenti;
@@ -81,18 +81,20 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         holder.data.setText(listOfEsercenti.get(position).getDate());
         holder.indirizzo.setText(listOfEsercenti.get(position).getIndirizzo());
 
-        LinearLayout a = new LinearLayout(context);
-        a.setOrientation(LinearLayout.VERTICAL);
 
-        for (Agreement vantaggio: listOfEsercenti.get(position).properties.agreements){
-        TextView textTmp = new TextView(context);
-            textTmp.setText(vantaggio.getDescriptionShort());
-            textTmp.setTextColor(context.getResources().getColor(R.color.colorPrimary));
-        a.addView(textTmp);
+
+        if(holder.linearLayoutVantaggi.getChildAt(0) == null) {
+            LinearLayout a = new LinearLayout(context);
+            a.setOrientation(LinearLayout.VERTICAL);
+            for (Agreement vantaggio : listOfEsercenti.get(position).properties.agreements) {
+                TextView textTmp = new TextView(context);
+                textTmp.setText(vantaggio.getDescriptionShort());
+                textTmp.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+                //textTmp.setTextSize(context.getResources().getDimension(R.dimen.elementiListaFontSize));
+                a.addView(textTmp);
+            }
+            holder.linearLayoutVantaggi.addView(a);
         }
-
-        holder.linearLayoutVantaggi.addView(a);
-
 
 
         return view;
@@ -103,7 +105,7 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
 
         int resource = view.getId();
 
-        if(resource == R.id.title) {
+        if (resource == R.id.title) {
 
         }
 
@@ -113,7 +115,7 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         listOfEsercenti = new ArrayList<>(esercenti);
     }
 
-    static class EsercenteViewHolder  {
+    static class EsercenteViewHolder {
         TextView title;
         TextView indirizzo;
         TextView data;

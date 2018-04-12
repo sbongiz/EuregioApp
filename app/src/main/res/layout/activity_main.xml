@@ -45,15 +45,19 @@
             android:theme="?attr/actionBarTheme"
             app:collapseIcon="@drawable/icon_back">
 
+            <TextView
+                android:id="@+id/titolo_toolbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_euregio"
+                android:textColor="@color/white"
+                android:textSize="@dimen/toolbarTitleFontSize" />
+
         </android.support.v7.widget.Toolbar>
 
 
 
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
     </FrameLayout>
 

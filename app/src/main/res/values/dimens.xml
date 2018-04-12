@@ -4,4 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="bottom_navigation_min_width">104dp</dimen>
     <dimen name="bottom_navigation_height">56dp</dimen>
+    <dimen name="toolbarTitleFontSize">18dp</dimen>
+    <dimen name="elementiListaFontSize">13dp</dimen>
 </resources>

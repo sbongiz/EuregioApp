@@ -119,8 +119,8 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
         viewPager = (NoSwipePager) findViewById(R.id.pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(0xFFFFFFFF);
-
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     private void setFragment() {

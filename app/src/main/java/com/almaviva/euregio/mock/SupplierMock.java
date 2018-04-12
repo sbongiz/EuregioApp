@@ -21,10 +21,14 @@ import java.util.ArrayList;
 public class SupplierMock {
 
     public static ArrayList<Supplier> supplierMockList;
+    public static ArrayList<Category> categorie;
+    public static ArrayList<District> comprensori;
 
     public static ArrayList<Supplier> getListMock() throws ParseException {
 
         supplierMockList = new ArrayList<Supplier>();
+        categorie = CategoryMock.getListMock();
+        comprensori = DistrictMock.getListMock();
 
 
         //ESERCENTE 1
@@ -40,8 +44,8 @@ public class SupplierMock {
 
         Location loc = new Location();
         LocationProperties locationProperties = new LocationProperties();
-        District dis = new District();
-        DistrictProperties districtProperties = new DistrictProperties();
+
+
 
 
         locationProperties.description = "Piazza del Grano 21";
@@ -50,26 +54,20 @@ public class SupplierMock {
         locationProperties.lat = "46.4984357";
         locationProperties.lon = "11.3545733";
 
-        districtProperties.id = 1;
-        districtProperties.name = "Alto-Adige";
-        dis.description = "Descrizione Alto-adige";
-        dis.properties = districtProperties;
 
-        locationProperties.district = dis;
+
+        locationProperties.district = comprensori.get(2);
 
         loc.properties = locationProperties;
 
         sup.properties.location = loc;
 
-        Category cat = new Category();
-        CategoryProperties categoryProperties = new CategoryProperties();
-
-        categoryProperties.id = 1;
-        categoryProperties.name = "Commerciante";
-        cat.properties = categoryProperties;
-
         ArrayList<Category> categoryList= new ArrayList<Category>();
-        categoryList.add(cat);
+        categoryList.add(categorie.get(0));
+        categoryList.add(categorie.get(1));
+        categoryList.add(categorie.get(2));
+
+
         sup.properties.categories = categoryList;
 
         ArrayList<Agreement> vantaggiArrayList = new ArrayList<Agreement>();
@@ -101,8 +99,7 @@ public class SupplierMock {
 
         Location loc2 = new Location();
         LocationProperties locationProperties2 = new LocationProperties();
-        District dis2 = new District();
-        DistrictProperties districtProperties2 = new DistrictProperties();
+
 
 
         locationProperties2.description = "Piazza del Grano 45";
@@ -111,26 +108,18 @@ public class SupplierMock {
         locationProperties2.lat = "46.4984421";
         locationProperties2.lon = "11.3544793";
 
-        districtProperties2.id = 1;
-        districtProperties2.name = "Alto-Adige";
-        dis2.description = "Descrizione Alto-adige";
-        dis2.properties = districtProperties2;
-
-        locationProperties2.district = dis2;
+        locationProperties2.district = comprensori.get(2);
 
         loc2.properties = locationProperties2;
 
         sup2.properties.location = loc2;
 
-        Category cat2 = new Category();
-        CategoryProperties categoryProperties2 = new CategoryProperties();
 
-        categoryProperties2.id = 1;
-        categoryProperties2.name = "Commerciante";
-        cat2.properties = categoryProperties2;
 
         ArrayList<Category> categoryList2= new ArrayList<Category>();
-        categoryList.add(cat2);
+        categoryList2.add(categorie.get(3));
+        categoryList2.add(categorie.get(4));
+        categoryList2.add(categorie.get(5));
         sup2.properties.categories = categoryList2;
 
         ArrayList<Agreement> vantaggiArrayList2 = new ArrayList<Agreement>();
