@@ -1,5 +1,7 @@
 package com.almaviva.euregio.helper;
 
+import android.content.Context;
+
 import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
 import com.almaviva.euregio.model.Supplier;
@@ -15,12 +17,13 @@ public  class LocalStorage {
 
     public static ArrayList<Integer> filtriCategoria = new ArrayList<Integer>();
     public static Integer filtroComprensorio=null;
-    public static Integer filtroOrdine = null;
+    public static String filtroOrdine = null;
     public static boolean isSetCategoria=false;
     public static boolean isSetComprensorio=false;
-
     public static ArrayList<Supplier> listOfEsercenti = new ArrayList<Supplier>() ;
     public static ArrayList<Supplier> listOfEsercentiFiltrata = new ArrayList<Supplier>();
+    public static boolean isDecrescente=false;
+    public static String testoCercato;
 
 
     public static void setFiltriCategoria(ArrayList<Integer> filtriCategoriaNew){
@@ -38,10 +41,12 @@ public  class LocalStorage {
         return  filtroComprensorio;
     }
 
-    public static void  setFiltroOrdine(Integer filtroOrdineNew){
+    public static void  setFiltroOrdine(String filtroOrdineNew){
+
         filtroOrdine = filtroOrdineNew;
     }
-    public static Integer getFiltriOrdine(){
+    public static String getFiltriOrdine(){
+
         return  filtroOrdine;
     }
 
@@ -51,6 +56,7 @@ public  class LocalStorage {
     public static boolean getIsSetCategoria(){
         return  isSetCategoria;
     }
+
 
     public static void  setIsSetComprensorio(boolean isSetComprensorioNew){
         isSetComprensorio = isSetComprensorioNew;
@@ -87,4 +93,22 @@ public  class LocalStorage {
     public static ArrayList<Supplier> getListOfEsercentiFiltrata(){
         return  listOfEsercentiFiltrata;
     }
+
+    public static void setIsDecrescente(boolean isDecrescenteNew){
+        isDecrescente = isDecrescenteNew;
+    }
+
+    public static boolean getIsDecrescente(){
+            return  isDecrescente;
+    }
+
+    public static void setTestoCercato(String testoCercatoNew){
+        testoCercato = testoCercatoNew;
+    }
+
+    public static String getTestoCercato(){
+        return  testoCercato;
+    }
+
+
 }

@@ -1,11 +1,13 @@
 package com.almaviva.euregio.fragment;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,6 +27,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
@@ -36,6 +40,7 @@ import com.almaviva.euregio.R;
 import com.almaviva.euregio.adapter.EsercenteListAdapter;
 import com.almaviva.euregio.behavior.AnchorBottomSheetBehavior;
 import com.almaviva.euregio.helper.BottomSheet3DialogFragment;
+import com.almaviva.euregio.helper.FilterHelper;
 import com.almaviva.euregio.helper.LocalStorage;
 import com.almaviva.euregio.mock.SupplierMock;
 import com.almaviva.euregio.model.OrdineFiltro;
@@ -55,6 +60,7 @@ public class ListaFragment extends Fragment {
     public static TextView textViewNumeroRisultati;
     private TextView textViewFiltroOrdine;
     private ImageView iconOrdine;
+    private TextView TextViewFiltroOrdine;
     public static EsercenteListAdapter esercenteListAdapter;
     private ArrayList<Supplier> esercentiArrayList;
     private Toolbar toolbar;
@@ -67,6 +73,7 @@ public class ListaFragment extends Fragment {
     private boolean isFragmentShowing = false;
     private boolean isSearchWhite = false;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
+
 
     public ListaFragment() {
         // Required empty public constructor
@@ -92,7 +99,10 @@ public class ListaFragment extends Fragment {
             findComponentInView(view);
             setComponent();
             getEsercenti();
-            textViewNumeroRisultati.setText(esercentiArrayList.size() + " "+ getString(R.string.risultati));
+
+            setFiltriDaImpostazioni();
+
+            textViewNumeroRisultati.setText(esercentiArrayList.size() + " " + getString(R.string.risultati));
 
 
             //LISTENER
@@ -113,13 +123,28 @@ public class ListaFragment extends Fragment {
             iconOrdine.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    ArrayList<Supplier> afterFilterList = new ArrayList<Supplier>();
 
+                    animateIconaFiltro();
 
-                    ArrayList<Supplier> lo2 = LocalStorage.getListOfEsercentiFiltrata();
-                    if(textViewFiltroOrdine.getText()==getString(R.string.alfabetico)){
+                    FilterHelper.filtraTotale(getActivity());
+
+                }
+            });
+
+            textViewFiltroOrdine.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    ArrayList<Supplier> afterFilterList = new ArrayList<Supplier>();
+                    if (textViewFiltroOrdine.getText() == getString(R.string.alfabetico)) {
                         textViewFiltroOrdine.setText(getString(R.string.data_aggiornamento));
-                    }else{
+                        LocalStorage.setFiltroOrdine(getString(R.string.data_aggiornamento));
+                        FilterHelper.filtraTotale(getActivity());
+                    } else {
                         textViewFiltroOrdine.setText(getString(R.string.alfabetico));
+                        LocalStorage.setFiltroOrdine(getString(R.string.alfabetico));
+                        FilterHelper.filtraTotale(getActivity());
                     }
 
                 }
@@ -132,9 +157,49 @@ public class ListaFragment extends Fragment {
     }
 
 
+    private void setFiltriDaImpostazioni(){
+        LocalStorage.setFiltroOrdine(getString(R.string.alfabetico));
+        LocalStorage.setFiltroComprensorio(0);
+        LocalStorage.setTestoCercato("");
+    }
+
+    private void animateIconaFiltro() {
+
+        if (LocalStorage.getIsDecrescente()) {
+            rotateDown(getActivity(), iconOrdine);
+            LocalStorage.setIsDecrescente(false);
+        } else {
+            rotateUp(getActivity(), iconOrdine);
+            LocalStorage.setIsDecrescente(true);
+        }
+    }
+
+    private void rotateUp(Activity activity, View v) {
+        Animation a = AnimationUtils.loadAnimation(activity, R.anim.rotate_up);
+        a.setFillAfter(true);
+        if (a != null) {
+            a.reset();
+            if (v != null) {
+                v.clearAnimation();
+                v.startAnimation(a);
+            }
+        }
+    }
+
+    private void rotateDown(Activity activity, View v) {
+        Animation a = AnimationUtils.loadAnimation(activity, R.anim.rotate_down);
+        a.setFillAfter(true);
+        if (a != null) {
+            a.reset();
+            if (v != null) {
+                v.clearAnimation();
+                v.startAnimation(a);
+            }
+        }
+    }
+
     public void showModalBottomSheet() {
         bottomSheetDialogFragment = new BottomSheet3DialogFragment();
-
         bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
@@ -175,17 +240,17 @@ public class ListaFragment extends Fragment {
         try {
             esercentiArrayList = new ArrayList<Supplier>();
 
-            if(LocalStorage.getListOfEsercentiFiltrata().size()==0){
+            if (LocalStorage.getListOfEsercentiFiltrata().size() == 0) {
                 esercentiArrayList = SupplierMock.getListMock();
                 LocalStorage.setListOfEsercenti(esercentiArrayList);
-            }else{
+            } else {
                 esercentiArrayList = LocalStorage.getListOfEsercentiFiltrata();
             }
 
             esercenteListAdapter.add(esercentiArrayList);
             esercenteListAdapter.notifyDataSetChanged();
 
-            if(LocalStorage.getListOfEsercentiFiltrata().size() ==0){
+            if (LocalStorage.getListOfEsercentiFiltrata().size() == 0) {
                 LocalStorage.setListOfEsercentiFiltrata(esercentiArrayList);
             }
 
@@ -208,6 +273,7 @@ public class ListaFragment extends Fragment {
         textViewNumeroRisultati = (TextView) view.findViewById(R.id.textView_numero_risultati);
         textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
         iconOrdine = (ImageView) view.findViewById(R.id.iconFilterAlfabetico);
+        textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
     }
 
     private void setMenuComponent(Menu menu) {
@@ -266,7 +332,30 @@ public class ListaFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String query) {
 
-                return true;
+
+                final String textCercato = query;
+
+                // Remove all previous callbacks.
+                Handler handler = new Handler();
+
+
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+
+                        LocalStorage.setTestoCercato(textCercato);
+                        FilterHelper.filtraTotale(getActivity());
+                    }
+                };
+
+                handler.removeCallbacks(runnable);
+
+
+
+                handler.postDelayed(runnable, 5000);
+
+
+                return false;
 
             }
 

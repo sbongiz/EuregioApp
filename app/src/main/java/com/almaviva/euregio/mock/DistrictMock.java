@@ -20,42 +20,42 @@ public class DistrictMock {
 
         District dis = new District();
         DistrictProperties districtProperties = new DistrictProperties();
-        districtProperties.id = 0;
+        districtProperties.id = 1;
         districtProperties.name = "Val Venosta";
         dis.properties = districtProperties;
         comprensorioArrayList.add(dis);
 
         District dis2 = new District();
         DistrictProperties districtProperties2 = new DistrictProperties();
-        districtProperties2.id = 1;
+        districtProperties2.id = 2;
         districtProperties2.name = "Burgraviato";
         dis2.properties = districtProperties2;
         comprensorioArrayList.add(dis2);
 
         District dis3 = new District();
         DistrictProperties districtProperties3 = new DistrictProperties();
-        districtProperties3.id = 2;
+        districtProperties3.id = 3;
         districtProperties3.name = "Bolzano";
         dis3.properties = districtProperties3;
         comprensorioArrayList.add(dis3);
 
         District dis4 = new District();
         DistrictProperties districtProperties4 = new DistrictProperties();
-        districtProperties4.id = 3;
+        districtProperties4.id = 4;
         districtProperties4.name = "Oltradige/Bassa Atesina";
         dis4.properties = districtProperties4;
         comprensorioArrayList.add(dis4);
 
         District dis5 = new District();
         DistrictProperties districtProperties5 = new DistrictProperties();
-        districtProperties5.id = 4;
+        districtProperties5.id = 5;
         districtProperties5.name = "Val Isarco";
         dis5.properties = districtProperties5;
         comprensorioArrayList.add(dis5);
 
         District dis6 = new District();
         DistrictProperties districtProperties6 = new DistrictProperties();
-        districtProperties6.id = 5;
+        districtProperties6.id = 6;
         districtProperties6.name = "Wipptal";
         dis6.properties = districtProperties6;
         comprensorioArrayList.add(dis6);
