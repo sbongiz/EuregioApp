@@ -38,6 +38,13 @@
 
     </android.support.v4.widget.NestedScrollView> -->
 
-    <include layout="@layout/bottom_sheet"/>
+    <include
+        android:id="@+id/bottom_sheet"
+        layout="@layout/bottom_sheet" />
+
+    <include
+        android:id="@+id/vantaggi_brevi"
+        layout="@layout/informazioni_brevi"
+        android:visibility="gone" />
 
 </android.support.design.widget.CoordinatorLayout>

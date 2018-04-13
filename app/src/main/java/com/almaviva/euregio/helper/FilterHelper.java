@@ -7,10 +7,13 @@ import android.support.v4.app.Fragment;
 import com.almaviva.euregio.MainActivity;
 import com.almaviva.euregio.R;
 import com.almaviva.euregio.fragment.ListaFragment;
+import com.almaviva.euregio.fragment.MapFragment;
 import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
 import com.almaviva.euregio.model.Location;
 import com.almaviva.euregio.model.Supplier;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -30,15 +33,14 @@ public class FilterHelper {
     public static ArrayList<Supplier> arrayEsercentiFiltrato;
 
 
-    public static void filtraTotale(Context con){
+    public static void filtraTotale(Context con) {
 
         boolean isDescrescente = LocalStorage.getIsDecrescente();
-        String testoCercato= LocalStorage.getTestoCercato()
-                ;
+        String testoCercato = LocalStorage.getTestoCercato();
 
         filtraListaEsercenti();
 
-        filtraListaPerOrdine(con,isDescrescente);
+        filtraListaPerOrdine(con, isDescrescente);
 
         filtraListaPerTesto(testoCercato);
 
@@ -47,7 +49,7 @@ public class FilterHelper {
 
     }
 
-    public static void filtraListaPerTesto(String testoCercato){
+    public static void filtraListaPerTesto(String testoCercato) {
 
         if (arrayEsercentiFiltrato == null) {
             arrayEsercentiFiltrato = new ArrayList<Supplier>();
@@ -71,44 +73,44 @@ public class FilterHelper {
 
         String tipoOrdine = LocalStorage.getFiltriOrdine();
 
-        if(tipoOrdine == con.getString(R.string.alfabetico)){
+        if (tipoOrdine == con.getString(R.string.alfabetico)) {
 
-            if(!isDescrescente){
+            if (!isDescrescente) {
                 Collections.sort(arrayEsercentiFiltrato, new Comparator<Supplier>() {
                     @Override
                     public int compare(Supplier s1, Supplier s2) {
                         String prima = s1.properties.title;
-                        String seconda= s2.properties.title;
+                        String seconda = s2.properties.title;
                         return prima.compareToIgnoreCase(seconda);
                     }
                 });
-            }else{
+            } else {
                 Collections.sort(arrayEsercentiFiltrato, new Comparator<Supplier>() {
                     @Override
                     public int compare(Supplier s1, Supplier s2) {
                         String prima = s1.properties.title;
-                        String seconda= s2.properties.title;
+                        String seconda = s2.properties.title;
                         return seconda.compareToIgnoreCase(prima);
                     }
                 });
             }
-        }else{
+        } else {
 
-            if(!isDescrescente){
+            if (!isDescrescente) {
                 Collections.sort(arrayEsercentiFiltrato, new Comparator<Supplier>() {
                     @Override
                     public int compare(Supplier s1, Supplier s2) {
                         String prima = s1.properties.lastUpdate;
-                        String seconda= s2.properties.lastUpdate;
+                        String seconda = s2.properties.lastUpdate;
                         return prima.compareToIgnoreCase(seconda);
                     }
                 });
-            }else{
+            } else {
                 Collections.sort(arrayEsercentiFiltrato, new Comparator<Supplier>() {
                     @Override
                     public int compare(Supplier s1, Supplier s2) {
                         String prima = s1.properties.lastUpdate;
-                        String seconda= s2.properties.lastUpdate;
+                        String seconda = s2.properties.lastUpdate;
                         return seconda.compareToIgnoreCase(prima);
                     }
                 });
@@ -175,7 +177,56 @@ public class FilterHelper {
         LocalStorage.setListOfEsercentiFiltrata(arrayEsercentiFiltrato);
     }
 
-    public static void aggiornaComponentInListaFragment(Context con){
+    public static void filtraSuMappa(Context con) {
+        arrayEsercenti = new ArrayList<Supplier>();
+        arrayEsercentiFiltrato = new ArrayList<Supplier>();
+
+        arrayEsercenti = LocalStorage.getListOfEsercenti();
+        arrayEsercentiFiltrato.addAll(arrayEsercenti);
+
+        final ArrayList<Integer> listCategorieId = LocalStorage.getFiltriCategoriaMappa();
+
+        Iterator<Supplier> iter = arrayEsercentiFiltrato.iterator();
+
+
+        while (iter.hasNext()) {
+            boolean trovato = false;
+            boolean rimosso = false;
+            Supplier sup = iter.next();
+            ArrayList<Category> categorieEsercente = sup.properties.categories;
+
+
+            if (listCategorieId != null) {
+                for (Category cat : categorieEsercente) {
+
+                    if (listCategorieId.contains(cat.properties.id)) {
+                        trovato = true;
+                        break;
+                    }
+                    String e = "";
+                }
+            }
+
+            if (listCategorieId.size() == 0) {
+                //se non specificato il filtro su categoria ritorno tutto!!!
+                trovato = true;
+            }
+
+            if (!trovato) {
+                iter.remove();
+                rimosso = true;
+            }
+
+
+        }
+
+        LocalStorage.setListOfEsercentiFiltrataMappa(arrayEsercentiFiltrato);
+
+        aggiornaComponentInMapFragment(con);
+    }
+
+
+    public static void aggiornaComponentInListaFragment(Context con) {
         MainActivity context = (MainActivity) con;
         List<Fragment> fra = context.getSupportFragmentManager().getFragments();
         ListaFragment listaFragment = (ListaFragment) fra.get(0);
@@ -188,6 +239,35 @@ public class FilterHelper {
         int numero_risultati = LocalStorage.getListOfEsercentiFiltrata().size();
 
         listaFragment.textViewNumeroRisultati.setText(numero_risultati + " " + con.getString(R.string.risultati));
+
+    }
+
+
+    public static void aggiornaComponentInMapFragment(Context con){
+
+        MainActivity context = (MainActivity) con;
+        List<Fragment> fra = context.getSupportFragmentManager().getFragments();
+        MapFragment mapFragment = (MapFragment) fra.get(1);
+
+        ArrayList<Supplier> ar = LocalStorage.getListOfEsercentiFiltrataMappa();
+
+        mapFragment.googleMap.clear();
+
+        for (Supplier sup: ar) {
+
+            Double lat = Double.parseDouble(sup.properties.location.properties.lat);
+            Double lon = Double.parseDouble(sup.properties.location.properties.lon);
+            LatLng markerLatLng = new LatLng(lat,lon);
+
+            MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.properties.location.properties.description);
+            String id = Integer.toString(sup.properties.id);
+            markerCorrente.snippet(id);
+            mapFragment.googleMap.addMarker(markerCorrente);
+
+        }
+
+
+
 
     }
 }

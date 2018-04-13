@@ -66,12 +66,12 @@ public class ListaFragment extends Fragment {
     private Toolbar toolbar;
     private SearchManager searchManager;
     private SearchView searchView;
-    private MenuItem filter;
+    public static MenuItem filter;
     private TextView badgeTextView;
     private ImageView searchClose;
     private TransitionDrawable transition;
     private boolean isFragmentShowing = false;
-    private boolean isSearchWhite = false;
+    public boolean isSearchWhite = false;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
 
@@ -282,8 +282,6 @@ public class ListaFragment extends Fragment {
             searchView = (SearchView) menu.findItem(R.id.searchView).getActionView();
             toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
             filter = menu.findItem(R.id.filter);
-            FrameLayout notifCount = (FrameLayout) MenuItemCompat.getActionView(filter);
-            badgeTextView = (TextView) notifCount.findViewById(R.id.actionbar_notifcation_textview);
             searchClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
@@ -381,7 +379,16 @@ public class ListaFragment extends Fragment {
     }
 
     private void changeSearchToNormalMode() {
-        MenuItemCompat.setActionView(filter, R.layout.badge);
+        Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
+
+        if(numero_risultati ==1){
+            filter.setIcon(R.drawable.icon_settingswhite1);
+        }else if(numero_risultati ==2){
+            filter.setIcon(R.drawable.icon_settingswhite2);
+        }else{
+            filter.setIcon(R.drawable.icon_settingswhite);
+        }
+
         if (transition == null) {
             transition = (TransitionDrawable) toolbar.getBackground();
         }
@@ -393,8 +400,16 @@ public class ListaFragment extends Fragment {
     }
 
     private void changeSearchToWhiteMode() {
-        MenuItemCompat.setActionView(filter, R.layout.badge_grey);
 
+        Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
+
+        if(numero_risultati ==1){
+            filter.setIcon(R.drawable.icon_settingsgray1);
+        }else if(numero_risultati ==2){
+            filter.setIcon(R.drawable.icon_settingsgray2);
+        }else{
+            filter.setIcon(R.drawable.icon_settingsgrey);
+        }
         if (transition == null) {
             transition = (TransitionDrawable) toolbar.getBackground();
         }

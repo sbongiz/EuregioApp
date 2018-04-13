@@ -2,31 +2,44 @@ package com.almaviva.euregio.fragment;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.almaviva.euregio.R;
 
 import com.almaviva.euregio.behavior.AnchorBottomSheetBehavior;
+import com.almaviva.euregio.helper.BottomSheet2DialogFragment;
+import com.almaviva.euregio.helper.BottomSheet3DialogFragment;
+import com.almaviva.euregio.helper.LocalStorage;
+import com.almaviva.euregio.model.Agreement;
+import com.almaviva.euregio.model.Supplier;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,7 +49,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -44,19 +60,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private OnFragmentInteractionListener mListener;
     private AnchorBottomSheetBehavior mBottomSheetBehavior;
     private View bottomSheet;
+    private View vantaggiBrevi;
     private Marker currentMarker = null;
     private boolean onMarkerClick = false;
     private Toolbar toolbar;
     private SupportMapFragment mapFragment;
     private SearchManager searchManager;
     private SearchView searchView;
-    private MenuItem filter;
-    private TextView badgeTextView;
+    public static MenuItem filter;
     private ImageView searchClose;
     private  TransitionDrawable transition;
     private boolean isFragmentShowing= false;
-    private boolean isSearchWhite= false;
-    GoogleMap googleMap;
+    public static boolean isSearchWhite= false;
+    private BottomSheetDialogFragment bottomSheetDialogFragment;
+    public static GoogleMap googleMap;
+    private LinearLayout layoutBottomSheet;
 
     public MapFragment() {
         // Required empty public constructor
@@ -80,10 +98,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         try {
             setComponent(view);
 
+            if (LocalStorage.getListOfEsercentiFiltrataMappa().size() == 0) {
+                LocalStorage.setListOfEsercentiFiltrataMappa(LocalStorage.getListOfEsercenti());
+            }
+
             mapFragment.getMapAsync(this);
 
             mBottomSheetBehavior = AnchorBottomSheetBehavior.from(bottomSheet);
-            mBottomSheetBehavior.setPeekHeight(350);
+
+
+
+            mBottomSheetBehavior.setPeekHeight(600);
             mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_HIDDEN);
 
             setHasOptionsMenu(true);
@@ -96,12 +121,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     if (newState == AnchorBottomSheetBehavior.STATE_EXPANDED) {
                         Log.e("EXP","ANDED");
                         centerMarkerDetail(currentMarker, true);
+                        mostraComponentiDettaglio();
                     }
                     if (newState == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
                         Log.e("COLL","APSED");
                         if (!onMarkerClick) {
-
                             centerMarkerDetail(currentMarker, false);
+                            nascondiComponentiDettaglio();
                         }
                     }
                     if(newState == AnchorBottomSheetBehavior.STATE_ANCHOR_POINT){
@@ -170,6 +196,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         try {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_view);
             bottomSheet = view.findViewById(R.id.bottom_sheet);
+            vantaggiBrevi = view.findViewById(R.id.vantaggi_brevi);
 
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
@@ -182,8 +209,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             searchView = (SearchView) menu.findItem(R.id.searchView).getActionView();
             toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
             filter = menu.findItem(R.id.filter);
-            FrameLayout notifCount = (FrameLayout) MenuItemCompat.getActionView(filter);
-            badgeTextView = (TextView) notifCount.findViewById(R.id.actionbar_notifcation_textview);
             searchClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
@@ -194,19 +219,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap mappa) {
         googleMap = mappa;
 
-        // Add a marker in Sydney and move the camera
-        LatLng lavis = new LatLng(46.497641, 11.355022);
-        LatLng lavis1 = new LatLng(46.498118, 11.355330);
-        LatLng lavis2 = new LatLng(46.498162, 11.354413);
-        LatLng lavis3 = new LatLng(46.498609, 11.354370);
-        LatLng lavis4 = new LatLng(46.498565, 11.355169);
 
-        googleMap.addMarker(new MarkerOptions().position(lavis).title("Marker in Lavis"));
-        googleMap.addMarker(new MarkerOptions().position(lavis1).title("Marker in Lavis1"));
-        googleMap.addMarker(new MarkerOptions().position(lavis2).title("Marker in Lavis2"));
-        googleMap.addMarker(new MarkerOptions().position(lavis3).title("Marker in Lavis3"));
-        googleMap.addMarker(new MarkerOptions().position(lavis4).title("Marker in Lavis4"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(lavis));
+        for (Supplier sup: LocalStorage.getListOfEsercentiFiltrataMappa()) {
+
+            Double lat = Double.parseDouble(sup.properties.location.properties.lat);
+            Double lon = Double.parseDouble(sup.properties.location.properties.lon);
+            LatLng markerLatLng = new LatLng(lat,lon);
+
+            MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.properties.location.properties.description);
+            String id = Integer.toString(sup.properties.id);
+            markerCorrente.snippet(id);
+            googleMap.addMarker(markerCorrente);
+        }
+
+
+
+       // googleMap.moveCamera(CameraUpdateFactory.newLatLng(lavis));
+
+
         setCenterOfMap();
 
         //region GOOGLE MAP LISTENER
@@ -215,16 +245,70 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public boolean onMarkerClick(Marker marker) {
                 currentMarker = marker;
                 centerMarker(currentMarker);
+                setDettaglioComponentInBottomSheet(currentMarker);
 
                 if (mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_HIDDEN || mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_EXPANDED) {
                     onMarkerClick = true;
                     mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_COLLAPSED);
-                    mBottomSheetBehavior.setPeekHeight(350);
+                    mBottomSheetBehavior.setPeekHeight(600);
+
                 }
                 return true;
             }
         });
         //endregion
+    }
+
+
+    public void setDettaglioComponentInBottomSheet(Marker currentMarker){
+        String markerSnippet  = currentMarker.getSnippet();
+        int id = Integer.valueOf(markerSnippet);
+
+        Supplier esercenteSelezionato = new Supplier();
+
+        for (Supplier sup: LocalStorage.getListOfEsercentiFiltrataMappa()) {
+
+            if (sup.properties.id == id){
+                esercenteSelezionato= sup;
+            }
+        }
+
+        TextView esercenteDettaglioTitolo = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_titolo);
+        TextView esercenteDettaglioData = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_data);
+        TextView esercenteDettaglioIndirizzo= (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_indirizzo);
+        LinearLayout esercenteDettaglioListaVantaggi = (LinearLayout) vantaggiBrevi.findViewById(R.id.esercente_dettaglio_vantaggi);
+        LinearLayout esercenteDettaglioLungo = (LinearLayout) bottomSheet.findViewById(R.id.layout_informazioni);
+
+        ArrayList<Agreement> listaVantaggi = esercenteSelezionato.properties.agreements;
+
+        esercenteDettaglioListaVantaggi.removeAllViews();
+        esercenteDettaglioLungo.removeAllViews();
+
+        for (Agreement vant: listaVantaggi) {
+
+            TextView textTmp = new TextView(getActivity());
+            TextView textTmpLunga = new TextView(getActivity());
+            textTmp.setText(vant.getDescriptionShort());
+            textTmpLunga.setText(vant.properties.description);
+            textTmp.setTextColor(getResources().getColor(R.color.colorPrimary));
+            textTmpLunga.setTextColor(getResources().getColor(R.color.colorPrimary));
+            textTmp.setTextSize(13);
+            textTmpLunga.setTextSize(13);
+
+            textTmpLunga.setGravity(Gravity.CENTER_VERTICAL);
+
+            esercenteDettaglioListaVantaggi.addView(textTmp);
+            esercenteDettaglioLungo.addView(textTmpLunga);
+
+        }
+
+
+        esercenteDettaglioTitolo.setText(esercenteSelezionato.properties.title);
+        esercenteDettaglioData.setText(esercenteSelezionato.properties.lastUpdate);
+        esercenteDettaglioIndirizzo.setText(esercenteSelezionato.properties.location.properties.description);
+
+
+
     }
 
     public void centerMarker(Marker marker) {
@@ -318,8 +402,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.searchView:
+                return true;
+            case R.id.filter:
+                showModalBottomSheet();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void showModalBottomSheet() {
+        bottomSheetDialogFragment = new BottomSheet2DialogFragment();
+        bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
+
     private void changeSearchToNormalMode() {
-        MenuItemCompat.setActionView(filter, R.layout.badge);
+
+        Integer numero_risultati = LocalStorage.getNumberOfFilterSetMappa();
+
+        if(numero_risultati ==1){
+            filter.setIcon(R.drawable.icon_settingswhite1);
+        }else{
+            filter.setIcon(R.drawable.icon_settingswhite);
+        }
+
+
         if(transition==null){
             transition = (TransitionDrawable) toolbar.getBackground();
         }
@@ -331,11 +443,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void changeSearchToWhiteMode() {
-        MenuItemCompat.setActionView(filter, R.layout.badge_grey);
+
+        Integer numero_risultati = LocalStorage.getNumberOfFilterSetMappa();
+
+        if(numero_risultati ==1){
+            filter.setIcon(R.drawable.icon_settingsgray1);
+        }else{
+            filter.setIcon(R.drawable.icon_settingsgrey);
+        }
 
         if(transition==null){
             transition = (TransitionDrawable) toolbar.getBackground();
         }
+
 
         transition.startTransition(300);
         isSearchWhite=true;
@@ -345,8 +465,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void customizeSearchView() {
         try {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-            MenuItemCompat.setActionView(filter, R.layout.badge);
-            badgeTextView.setText("12");
+
             searchClose.setImageResource(R.drawable.icon_remove);
 
             View searchPlate = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
@@ -362,7 +481,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             try {
                 Field mCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
                 mCursorDrawableRes.setAccessible(true);
-              //  mCursorDrawableRes.set(searchTextView, R.drawable.search_cursor); //This sets the cursor resource ID to 0 or @null which will make it visible on white background
+                //  mCursorDrawableRes.set(searchTextView, R.drawable.search_cursor); //This sets the cursor resource ID to 0 or @null which will make it visible on white background
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -386,6 +505,53 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    public static float convertPixelsToDp(float px, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return dp;
+    }
+
+
+   public void mostraComponentiDettaglio(){
+
+       vantaggiBrevi.setVisibility(View.GONE);
+
+   }
+
+
+    public void nascondiComponentiDettaglio(){
+
+        vantaggiBrevi.setVisibility(View.VISIBLE);
+
+    }
+
+
+    private static void slideDown(Context ctx, View v) {
+        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_down);
+
+        if (a != null) {
+            a.reset();
+            if (v != null) {
+                v.clearAnimation();
+                v.startAnimation(a);
+            }
+        }
+    }
+
+
+
+    private static void slideUp(Context ctx, View v) {
+        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_up);
+
+        if (a != null) {
+            a.reset();
+            if (v != null) {
+                v.clearAnimation();
+                v.startAnimation(a);
+            }
+        }
+    }
 
 
 }

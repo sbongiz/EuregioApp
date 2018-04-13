@@ -1,17 +1,9 @@
 package com.almaviva.euregio.helper;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.ActionMenuView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -30,41 +22,28 @@ import com.almaviva.euregio.fragment.ListaFragment;
 import com.almaviva.euregio.fragment.MapFragment;
 import com.almaviva.euregio.mock.CategoryMock;
 import com.almaviva.euregio.mock.DistrictMock;
-import com.almaviva.euregio.mock.OrdineMock;
 import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
-import com.almaviva.euregio.model.OrdineFiltro;
-import com.almaviva.euregio.model.Supplier;
-
-import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by a.sciarretta on 10/04/2018.
+ * Created by a.sciarretta on 13/04/2018.
  */
 
-public class BottomSheet3DialogFragment extends android.support.design.widget.BottomSheetDialogFragment {
+public class BottomSheet2DialogFragment extends android.support.design.widget.BottomSheetDialogFragment {
 
     private RadioGroup categoryRadioGroup;
-    private RadioGroup comprensorioRadioGroup;
     private ArrayList<Category> categoryList;
-    private ArrayList<District> comprensorioList;
     private boolean isCategoryListShown = false;
-    private boolean isComprensorioListShown = false;
     private TextView filtroSelezionato;
-    private TextView filtroSelezionatoComprensorio;
     private TextView resetButton;
     private TextView confermaButton;
     private View iconaExpand;
-    private View iconaExpandComprensorio;
     private LinearLayout scrollViewCategorie;
-    private LinearLayout scrollViewComprensorio;
     private ArrayList<Integer> filtriSelezionatiCategoriaId;
-    private Integer filtriSelezionatiComprensorioId;
     private ProgressBar loading;
 
 
@@ -74,16 +53,14 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        View contentView = View.inflate(getContext(), R.layout.filter_bottom_sheet, null);
+        View contentView = View.inflate(getContext(), R.layout.filter_singolo_bottom_sheet, null);
         dialog.setContentView(contentView);
         getComponentInView(contentView);
         categoryRadioGroup.setVisibility(View.GONE);
-        comprensorioRadioGroup.setVisibility(View.GONE);
         loading.setVisibility(View.GONE);
 
         try {
             getCategory();
-            getComprensori();
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -100,20 +77,6 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
             }
         });
 
-        iconaExpandComprensorio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                try {
-                    animateRadioGroupComprensorio();
-                } catch (Exception e) {
-                    Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
-                }
-
-            }
-        });
-
-
 
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,22 +84,17 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
                 animateReset();
                 try {
                     uncheckAllSelectedCheckBox();
-                    uncheckComprensorioRadioButton();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 setTitleCategorie();
-                LocalStorage.setFiltroComprensorio(0);
-                LocalStorage.setTestoCercato("");
-                RadioButton selectedRadioButton = (RadioButton) comprensorioRadioGroup.findViewById(0);
-                filtroSelezionatoComprensorio.setText(selectedRadioButton.getText());
+                LocalStorage.setTestoCercatoMappa("");
 
-                FilterHelper.filtraTotale(getActivity());
+                FilterHelper.filtraSuMappa(getActivity());
 
-                LocalStorage.setIsSetCategoria(false);
-                LocalStorage.setIsSetComprensorio(false);
+                LocalStorage.setIsSetCategoriaMappa(false);
 
-                Log.e("FILTRI NUMERO: ", LocalStorage.getNumberOfFilterSet().toString());
+                Log.e("FILTRI NUMERO: ", LocalStorage.getNumberOfFilterSetMappa().toString());
                 setIconaFiltroMenu();
             }
         });
@@ -151,67 +109,32 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
         });
 
 
-        comprensorioRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-                RadioButton selectedRadioButton = (RadioButton) group.findViewById(checkedId);
-                filtroSelezionatoComprensorio.setText(selectedRadioButton.getText());
-
-                LocalStorage.setFiltroComprensorio(checkedId);
-                if(!LocalStorage.getIsSetComprensorio()){
-                    LocalStorage.setIsSetComprensorio(true);
-                }
-                filtraListaEsercenti();
-                Log.e("FILTRI NUMERO",LocalStorage.getNumberOfFilterSet().toString());
-                setIconaFiltroMenu();
-            }
-        });
-
 
     }
 
     private void getComponentInView(View contentView){
         iconaExpand = contentView.findViewById(R.id.icona_expand);
-        iconaExpandComprensorio = contentView.findViewById(R.id.icona_expand_comprensorio);
         categoryRadioGroup = (RadioGroup) contentView.findViewById(R.id.radioGroup_category);
-        comprensorioRadioGroup = (RadioGroup) contentView.findViewById(R.id.radioGroup_comprensorio);
         filtroSelezionato = (TextView) contentView.findViewById(R.id.textView_filtro_selezionato);
-        filtroSelezionatoComprensorio = (TextView) contentView.findViewById(R.id.textView_filtro_selezionato_comprensorio);
         resetButton = (TextView) contentView.findViewById(R.id.button_reset);
         confermaButton = (TextView) contentView.findViewById(R.id.button_conferma);
         scrollViewCategorie = (LinearLayout) contentView.findViewById(R.id.scrollViewCategorie);
-        scrollViewComprensorio = (LinearLayout) contentView.findViewById(R.id.scrollViewCategorie_comprensorio);
         loading = (ProgressBar) contentView.findViewById(R.id.loading);
     }
 
     private void uncheckAllSelectedCheckBox() throws ParseException {
 
         ArrayList<Integer> a = new ArrayList<Integer>();
-        a.addAll(LocalStorage.getFiltriCategoria());
+        a.addAll(LocalStorage.getFiltriCategoriaMappa());
         for (Integer i : a) {
             CheckBox selectedRadioButton = (CheckBox) categoryRadioGroup.findViewById(i);
             selectedRadioButton.setChecked(false);
         }
 
         filtriSelezionatiCategoriaId = new ArrayList<Integer>();
-        LocalStorage.setFiltriCategoria(filtriSelezionatiCategoriaId);
+        LocalStorage.setFiltriCategoriaMappa(filtriSelezionatiCategoriaId);
     }
 
-    private void uncheckComprensorioRadioButton(){
-
-        Integer index = LocalStorage.getFiltriComprensorio();
-        if(index!= null){
-            RadioButton selectedRadioButton = (RadioButton) comprensorioRadioGroup.findViewById(index);
-            selectedRadioButton.setChecked(false);
-
-        }
-
-
-        filtriSelezionatiComprensorioId = null;
-        LocalStorage.setFiltroComprensorio(filtriSelezionatiComprensorioId);
-
-    }
 
     private void animateRadioGroup() {
         if (isCategoryListShown) {
@@ -232,24 +155,6 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
         }
     }
 
-    private void animateRadioGroupComprensorio() {
-        if (isComprensorioListShown) {
-
-            slideUp(getContext(), scrollViewComprensorio);
-            rotateFrecciaDown(getContext(), iconaExpandComprensorio);
-            comprensorioRadioGroup.setBackgroundColor(getResources().getColor(R.color.white));
-            scrollViewComprensorio.setVisibility(View.GONE);
-            comprensorioRadioGroup.setVisibility(View.GONE);
-            isComprensorioListShown = false;
-        } else {
-            comprensorioRadioGroup.setBackgroundColor(getResources().getColor(R.color.light_grey));
-            slideDown(getContext(), scrollViewComprensorio);
-            rotateFrecciaUp(getContext(), iconaExpandComprensorio);
-            scrollViewComprensorio.setVisibility(View.VISIBLE);
-            comprensorioRadioGroup.setVisibility(View.VISIBLE);
-            isComprensorioListShown = true;
-        }
-    }
 
     private void animateReset() {
         if (isCategoryListShown) {
@@ -261,14 +166,6 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
             filtroSelezionato.setText(getString(R.string.tutte));
             isCategoryListShown = false;
 
-        }
-        if(isComprensorioListShown){
-            slideUp(getContext(), scrollViewComprensorio);
-            rotateFrecciaDown(getContext(), iconaExpandComprensorio);
-            comprensorioRadioGroup.setBackgroundColor(getResources().getColor(R.color.white));
-            scrollViewComprensorio.setVisibility(View.GONE);
-            comprensorioRadioGroup.setVisibility(View.GONE);
-            isComprensorioListShown = false;
         }
 
 
@@ -297,13 +194,13 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
                     }
 
                     if(filtriSelezionatiCategoriaId.size()==0){
-                        LocalStorage.setIsSetCategoria(false);
+                        LocalStorage.setIsSetCategoriaMappa(false);
                     }else{
-                        LocalStorage.setIsSetCategoria(true);
+                        LocalStorage.setIsSetCategoriaMappa(true);
                     }
-                    Log.e("FILTRI NUMERO",LocalStorage.getNumberOfFilterSet().toString());
+                    Log.e("FILTRI NUMERO",LocalStorage.getNumberOfFilterSetMappa().toString());
                     setIconaFiltroMenu();
-                    LocalStorage.setFiltriCategoria(filtriSelezionatiCategoriaId);
+                    LocalStorage.setFiltriCategoriaMappa(filtriSelezionatiCategoriaId);
                     filtraListaEsercenti();
                     setTitleCategorie();
                     filtroSelezionato.setText(titleFiltroCategorie);
@@ -315,7 +212,7 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
 
         }
 
-        if (LocalStorage.getFiltriCategoria().size() == 0) {
+        if (LocalStorage.getFiltriCategoriaMappa().size() == 0) {
             filtroSelezionato.setText(getString(R.string.tutte));
         } else {
             setTitleCategorie();
@@ -327,38 +224,31 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
 
     private void setIconaFiltroMenu(){
 
-        int numero_filtri_impostati  = LocalStorage.getNumberOfFilterSet();
+        int numero_filtri_impostati  = LocalStorage.getNumberOfFilterSetMappa();
 
         MainActivity mainActivity = (MainActivity) getActivity();
         List<Fragment> fra = mainActivity.getSupportFragmentManager().getFragments();
-        ListaFragment listaFragment = (ListaFragment) fra.get(0);
-
+        MapFragment mapFragment = (MapFragment) fra.get(1);
 
 
         if(numero_filtri_impostati==1){
-            if(listaFragment.isSearchWhite){
-                listaFragment.filter.setIcon(R.drawable.icon_settingsgray1);
+            if(mapFragment.isSearchWhite){
+                mapFragment.filter.setIcon(R.drawable.icon_settingsgray1);
             }else{
-                listaFragment.filter.setIcon(R.drawable.icon_settingswhite1);
-            }
-        }else if( numero_filtri_impostati==2){
-            if(listaFragment.isSearchWhite){
-                listaFragment.filter.setIcon(R.drawable.icon_settingsgray2);
-            }else{
-                listaFragment.filter.setIcon(R.drawable.icon_settingswhite2);
+                mapFragment.filter.setIcon(R.drawable.icon_settingswhite1);
             }
         }else{
-            if(listaFragment.isSearchWhite){
-                listaFragment.filter.setIcon(R.drawable.icon_settingsgrey);
+            if(mapFragment.isSearchWhite){
+                mapFragment.filter.setIcon(R.drawable.icon_settingsgrey);
             }else{
-                listaFragment.filter.setIcon(R.drawable.icon_settingswhite);
+                mapFragment.filter.setIcon(R.drawable.icon_settingswhite);
             }
         }
     }
 
     private void setTitleCategorie() {
         titleFiltroCategorie = "";
-        for (Integer i : LocalStorage.getFiltriCategoria()) {
+        for (Integer i : LocalStorage.getFiltriCategoriaMappa()) {
 
             CheckBox selectedRadioButton = (CheckBox) categoryRadioGroup.findViewById(i);
 
@@ -372,58 +262,14 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
         }
         if(titleFiltroCategorie==""){
             titleFiltroCategorie = getString(R.string.tutte);
-
-
         }
     }
 
-    private void getComprensori() throws ParseException {
-
-        comprensorioList = DistrictMock.getListMock();
-
-        final RadioButton[] rb = new RadioButton[comprensorioList.size() + 1];
-        comprensorioRadioGroup.setOrientation(RadioGroup.VERTICAL);
-
-        int i = 1;
-
-
-
-        rb[0] = new RadioButton(getContext());
-        rb[0].setText(getString(R.string.tutti));
-        rb[0].setId(0);
-        RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(0, 15, 0, 15);
-        rb[0].setLayoutParams(params);
-        rb[0].setTextColor(getResources().getColor(R.color.greyText));
-        comprensorioRadioGroup.addView(rb[0]);
-
-        for (District dis : comprensorioList) {
-
-            rb[i] = new RadioButton(getContext());
-            rb[i].setText(dis.properties.name);
-            rb[i].setId(dis.properties.id);
-            RadioGroup.LayoutParams params2 = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params2.setMargins(0, 15, 0, 15);
-            rb[i].setLayoutParams(params);
-            comprensorioRadioGroup.addView(rb[i]);
-            i++;
-        }
-
-        RadioButton selectedRadioButton;
-        if (LocalStorage.getFiltriComprensorio() == 0) {
-             selectedRadioButton = rb[0];
-        } else {
-            comprensorioRadioGroup.check(LocalStorage.getFiltriComprensorio());
-             selectedRadioButton = (RadioButton) comprensorioRadioGroup.findViewById(LocalStorage.getFiltriComprensorio());
-
-        }
-        filtroSelezionatoComprensorio.setText(selectedRadioButton.getText());
-    }
 
     public void filtraListaEsercenti(){
 
         loading.setVisibility(View.VISIBLE);
-        FilterHelper.filtraTotale(getActivity());
+        FilterHelper.filtraSuMappa(getActivity());
         loading.setVisibility(View.GONE);
 
 

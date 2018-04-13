@@ -16,15 +16,27 @@ import java.util.ArrayList;
 public  class LocalStorage {
 
     public static ArrayList<Integer> filtriCategoria = new ArrayList<Integer>();
+    public static ArrayList<Integer> filtriCategoriaMappa = new ArrayList<Integer>();
     public static Integer filtroComprensorio=null;
     public static String filtroOrdine = null;
     public static boolean isSetCategoria=false;
+    public static boolean isSetCategoriaMappa= false;
     public static boolean isSetComprensorio=false;
     public static ArrayList<Supplier> listOfEsercenti = new ArrayList<Supplier>() ;
     public static ArrayList<Supplier> listOfEsercentiFiltrata = new ArrayList<Supplier>();
+    public static ArrayList<Supplier> listOfEsercentiFiltrataMappa = new ArrayList<Supplier>();
     public static boolean isDecrescente=false;
     public static String testoCercato;
+    public static String testoCercatoMappa;
 
+
+    public static void setFiltriCategoriaMappa(ArrayList<Integer> filtriCategoriaMappaNew){
+        filtriCategoriaMappa = filtriCategoriaMappaNew;
+    }
+
+    public static ArrayList<Integer> getFiltriCategoriaMappa(){
+        return  filtriCategoriaMappa;
+    }
 
     public static void setFiltriCategoria(ArrayList<Integer> filtriCategoriaNew){
         filtriCategoria = filtriCategoriaNew;
@@ -33,6 +45,7 @@ public  class LocalStorage {
     public static ArrayList<Integer> getFiltriCategoria(){
         return  filtriCategoria;
     }
+
 
     public static void  setFiltroComprensorio(Integer filtroComprensorioNew){
         filtroComprensorio = filtroComprensorioNew;
@@ -57,6 +70,13 @@ public  class LocalStorage {
         return  isSetCategoria;
     }
 
+    public static void  setIsSetCategoriaMappa(boolean isSetCategoriaMappaNew){
+        isSetCategoriaMappa = isSetCategoriaMappaNew;
+    }
+    public static boolean getIsSetCategoriaMappa(){
+        return  isSetCategoriaMappa;
+    }
+
 
     public static void  setIsSetComprensorio(boolean isSetComprensorioNew){
         isSetComprensorio = isSetComprensorioNew;
@@ -72,6 +92,14 @@ public  class LocalStorage {
             number += 1;
         }
         if(isSetComprensorio){
+            number += 1;
+        }
+        return number;
+    }
+
+    public static Integer getNumberOfFilterSetMappa(){
+        Integer number = 0;
+        if(isSetCategoriaMappa){
             number += 1;
         }
         return number;
@@ -94,6 +122,16 @@ public  class LocalStorage {
         return  listOfEsercentiFiltrata;
     }
 
+    public static void setListOfEsercentiFiltrataMappa(ArrayList<Supplier> listOfEsercentiFiltrataMappaNew){
+        listOfEsercentiFiltrataMappa = listOfEsercentiFiltrataMappaNew;
+    }
+
+    public static ArrayList<Supplier> getListOfEsercentiFiltrataMappa(){
+        return  listOfEsercentiFiltrataMappa;
+    }
+
+
+
     public static void setIsDecrescente(boolean isDecrescenteNew){
         isDecrescente = isDecrescenteNew;
     }
@@ -108,6 +146,14 @@ public  class LocalStorage {
 
     public static String getTestoCercato(){
         return  testoCercato;
+    }
+
+    public static void setTestoCercatoMappa(String testoCercatoMappaNew){
+        testoCercatoMappa = testoCercatoMappaNew;
+    }
+
+    public static String getTestoCercatoMappa(){
+        return  testoCercatoMappa;
     }
 
 
