@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.accessibility.AccessibilityManagerCompat;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -69,11 +70,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private SearchView searchView;
     public static MenuItem filter;
     private ImageView searchClose;
-    private  TransitionDrawable transition;
-    private boolean isFragmentShowing= false;
-    public static boolean isSearchWhite= false;
+    private TransitionDrawable transition;
+    private boolean isFragmentShowing = false;
+    public static boolean isSearchWhite = false;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
     public static GoogleMap googleMap;
+    private ImageView imageBehind;
+
+    private int previousBottomSheetStatus;
+
     private LinearLayout layoutBottomSheet;
 
     public MapFragment() {
@@ -107,10 +112,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mBottomSheetBehavior = AnchorBottomSheetBehavior.from(bottomSheet);
 
 
-
             mBottomSheetBehavior.setPeekHeight(600);
             mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_HIDDEN);
-
+            previousBottomSheetStatus = 5; // IMPOSTO LO STATO A HIDDEN
             setHasOptionsMenu(true);
 
             //region BOTTOM SHEET LISTENER
@@ -119,19 +123,46 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 public void onStateChanged(@NonNull View bottomSheet, int newState) {
 
                     if (newState == AnchorBottomSheetBehavior.STATE_EXPANDED) {
-                        Log.e("EXP","ANDED");
                         centerMarkerDetail(currentMarker, true);
-                        mostraComponentiDettaglio();
+                        animateImage();
                     }
                     if (newState == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
-                        Log.e("COLL","APSED");
+
+                        if (previousBottomSheetStatus == AnchorBottomSheetBehavior.STATE_EXPANDED) {
+                            mostraComponentiDettaglio();
+                        } else if (previousBottomSheetStatus == AnchorBottomSheetBehavior.STATE_HIDDEN) {
+                            mostraComponentiDettaglio();
+                        } else if (previousBottomSheetStatus == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
+                            mostraComponentiDettaglio();
+
+                        }
                         if (!onMarkerClick) {
                             centerMarkerDetail(currentMarker, false);
+                        }
+                    }
+                    if (newState == AnchorBottomSheetBehavior.STATE_DRAGGING) {
+                        if (previousBottomSheetStatus == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
+                            //nascondo il dettaglio
                             nascondiComponentiDettaglio();
                         }
                     }
-                    if(newState == AnchorBottomSheetBehavior.STATE_ANCHOR_POINT){
-                        Log.e("ANCHOR","POINT");
+                    if (newState == AnchorBottomSheetBehavior.STATE_SETTLING) {
+                        if (previousBottomSheetStatus == AnchorBottomSheetBehavior.STATE_HIDDEN) {
+                            //mostraComponentiDettaglio();
+                        }
+                    }
+                    if (newState == AnchorBottomSheetBehavior.STATE_HIDDEN) {
+
+                        nascondiComponentiDettaglio();
+
+
+                        centerMarker(currentMarker);
+                    }
+
+
+                    if (newState != AnchorBottomSheetBehavior.STATE_SETTLING && newState != AnchorBottomSheetBehavior.STATE_DRAGGING) {
+                        previousBottomSheetStatus = newState;
+
                     }
                     onMarkerClick = false;
                 }
@@ -168,6 +199,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+    public void animateImage() {
+        Animation animation = new TranslateAnimation(0, 500, 0, 0);
+        animation.setDuration(1000);
+        animation.setFillAfter(true);
+//        imageBehind.startAnimation(animation);
+    }
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -198,6 +235,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             bottomSheet = view.findViewById(R.id.bottom_sheet);
             vantaggiBrevi = view.findViewById(R.id.vantaggi_brevi);
 
+
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
@@ -220,11 +258,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap = mappa;
 
 
-        for (Supplier sup: LocalStorage.getListOfEsercentiFiltrataMappa()) {
+        for (Supplier sup : LocalStorage.getListOfEsercentiFiltrataMappa()) {
 
             Double lat = Double.parseDouble(sup.properties.location.properties.lat);
             Double lon = Double.parseDouble(sup.properties.location.properties.lon);
-            LatLng markerLatLng = new LatLng(lat,lon);
+            LatLng markerLatLng = new LatLng(lat, lon);
 
             MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.properties.location.properties.description);
             String id = Integer.toString(sup.properties.id);
@@ -233,8 +271,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
 
-
-       // googleMap.moveCamera(CameraUpdateFactory.newLatLng(lavis));
+        // googleMap.moveCamera(CameraUpdateFactory.newLatLng(lavis));
 
 
         setCenterOfMap();
@@ -260,22 +297,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public void setDettaglioComponentInBottomSheet(Marker currentMarker){
-        String markerSnippet  = currentMarker.getSnippet();
+    public void setDettaglioComponentInBottomSheet(Marker currentMarker) {
+        String markerSnippet = currentMarker.getSnippet();
         int id = Integer.valueOf(markerSnippet);
 
         Supplier esercenteSelezionato = new Supplier();
 
-        for (Supplier sup: LocalStorage.getListOfEsercentiFiltrataMappa()) {
+        for (Supplier sup : LocalStorage.getListOfEsercentiFiltrataMappa()) {
 
-            if (sup.properties.id == id){
-                esercenteSelezionato= sup;
+            if (sup.properties.id == id) {
+                esercenteSelezionato = sup;
             }
         }
 
         TextView esercenteDettaglioTitolo = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_titolo);
         TextView esercenteDettaglioData = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_data);
-        TextView esercenteDettaglioIndirizzo= (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_indirizzo);
+        TextView esercenteDettaglioIndirizzo = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_indirizzo);
         LinearLayout esercenteDettaglioListaVantaggi = (LinearLayout) vantaggiBrevi.findViewById(R.id.esercente_dettaglio_vantaggi);
         LinearLayout esercenteDettaglioLungo = (LinearLayout) bottomSheet.findViewById(R.id.layout_informazioni);
 
@@ -284,7 +321,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         esercenteDettaglioListaVantaggi.removeAllViews();
         esercenteDettaglioLungo.removeAllViews();
 
-        for (Agreement vant: listaVantaggi) {
+        for (Agreement vant : listaVantaggi) {
 
             TextView textTmp = new TextView(getActivity());
             TextView textTmpLunga = new TextView(getActivity());
@@ -306,7 +343,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         esercenteDettaglioTitolo.setText(esercenteSelezionato.properties.title);
         esercenteDettaglioData.setText(esercenteSelezionato.properties.lastUpdate);
         esercenteDettaglioIndirizzo.setText(esercenteSelezionato.properties.location.properties.description);
-
 
 
     }
@@ -425,40 +461,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         Integer numero_risultati = LocalStorage.getNumberOfFilterSetMappa();
 
-        if(numero_risultati ==1){
+        if (numero_risultati == 1) {
             filter.setIcon(R.drawable.icon_settingswhite1);
-        }else{
+        } else {
             filter.setIcon(R.drawable.icon_settingswhite);
         }
 
 
-        if(transition==null){
+        if (transition == null) {
             transition = (TransitionDrawable) toolbar.getBackground();
         }
 
-        if(isSearchWhite){
-        transition.reverseTransition(300);
+        if (isSearchWhite) {
+            transition.reverseTransition(300);
         }
-        isSearchWhite =false;
+        isSearchWhite = false;
     }
 
     private void changeSearchToWhiteMode() {
 
         Integer numero_risultati = LocalStorage.getNumberOfFilterSetMappa();
 
-        if(numero_risultati ==1){
+        if (numero_risultati == 1) {
             filter.setIcon(R.drawable.icon_settingsgray1);
-        }else{
+        } else {
             filter.setIcon(R.drawable.icon_settingsgrey);
         }
 
-        if(transition==null){
+        if (transition == null) {
             transition = (TransitionDrawable) toolbar.getBackground();
         }
 
 
         transition.startTransition(300);
-        isSearchWhite=true;
+        isSearchWhite = true;
 
     }
 
@@ -495,39 +531,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            isFragmentShowing= true;
-        }
-        else {
-            if(isFragmentShowing){
-                 changeSearchToNormalMode();
+            isFragmentShowing = true;
+        } else {
+            if (isFragmentShowing) {
+                changeSearchToNormalMode();
             }
-            isFragmentShowing=false;
+            isFragmentShowing = false;
         }
     }
 
-    public static float convertPixelsToDp(float px, Context context){
+    public static float convertPixelsToDp(float px, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        float dp = px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         return dp;
     }
 
 
-   public void mostraComponentiDettaglio(){
+    public void mostraComponentiDettaglio() {
 
-       vantaggiBrevi.setVisibility(View.GONE);
-
-   }
-
-
-    public void nascondiComponentiDettaglio(){
-
+        //slideUpBottom(getActivity(),vantaggiBrevi);
         vantaggiBrevi.setVisibility(View.VISIBLE);
 
     }
 
 
-    private static void slideDown(Context ctx, View v) {
+    public void nascondiComponentiDettaglio() {
+
+        //slideUp(getActivity(),vantaggiBrevi);
+        vantaggiBrevi.setVisibility(View.GONE);
+
+    }
+
+
+    private static void slideUpBottom(Context ctx, View v) {
         Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_down);
 
         if (a != null) {
@@ -538,7 +575,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
-
 
 
     private static void slideUp(Context ctx, View v) {

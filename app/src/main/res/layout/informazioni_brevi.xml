@@ -6,11 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="126dp"
     android:layout_gravity="bottom"
-    android:layout_margin="16dp"
     android:animateLayoutChanges="true"
-    android:background="@color/white"
+    android:background="@color/light_grey"
     android:gravity="bottom"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp">
 
     <LinearLayout
         android:id="@+id/esercente_dettaglio_vantaggi"
@@ -25,7 +27,7 @@
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="61dp"
+        android:layout_marginBottom="50dp"
         android:layout_weight="1"
         app:srcCompat="@drawable/info" />
 </LinearLayout>
