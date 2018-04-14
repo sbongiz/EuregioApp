@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +18,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -75,6 +77,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public static boolean isSearchWhite = false;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
     public static GoogleMap googleMap;
+    private LinearLayout layoutImmagine;
     private ImageView imageBehind;
 
     private int previousBottomSheetStatus;
@@ -124,6 +127,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                     if (newState == AnchorBottomSheetBehavior.STATE_EXPANDED) {
                         centerMarkerDetail(currentMarker, true);
+                        layoutImmagine.setVisibility(View.VISIBLE);
                         animateImage();
                     }
                     if (newState == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
@@ -141,6 +145,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         }
                     }
                     if (newState == AnchorBottomSheetBehavior.STATE_DRAGGING) {
+                        layoutImmagine.setVisibility(View.GONE);
                         if (previousBottomSheetStatus == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
                             //nascondo il dettaglio
                             nascondiComponentiDettaglio();
@@ -200,10 +205,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void animateImage() {
-        Animation animation = new TranslateAnimation(0, 500, 0, 0);
+        Resources r = getResources();
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 181, r.getDisplayMetrics());
+        Animation animation = new TranslateAnimation(0, 0, px, 0);
         animation.setDuration(1000);
         animation.setFillAfter(true);
-//        imageBehind.startAnimation(animation);
+        imageBehind.startAnimation(animation);
     }
 
     public void onButtonPressed(Uri uri) {
@@ -234,7 +241,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_view);
             bottomSheet = view.findViewById(R.id.bottom_sheet);
             vantaggiBrevi = view.findViewById(R.id.vantaggi_brevi);
-
+            layoutImmagine = view.findViewById(R.id.image_dietro);
+            imageBehind = layoutImmagine.findViewById(R.id.image_behind_inside);
 
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());

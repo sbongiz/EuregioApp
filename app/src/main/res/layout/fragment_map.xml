@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <FrameLayout
         android:id="@+id/map_frame"
         android:layout_width="match_parent"
@@ -11,7 +12,6 @@
         android:layout_marginBottom="@dimen/bottom_navigation_height"
         android:layout_marginTop="@dimen/bottom_navigation_height"
         tools:context="com.almaviva.euregio.fragment.MapFragment">
-
 
         <fragment
             android:id="@+id/map_view"
@@ -45,6 +45,11 @@
     <include
         android:id="@+id/vantaggi_brevi"
         layout="@layout/informazioni_brevi"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/image_dietro"
+        layout="@layout/image_behind"
         android:visibility="gone" />
 
 </android.support.design.widget.CoordinatorLayout>

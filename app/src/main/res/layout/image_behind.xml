@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_image_behind"
     android:layout_width="match_parent"
-    android:layout_height="362dp"
+    android:layout_height="181dp"
     android:layout_gravity="top"
     android:layout_marginTop="56dp"
     android:orientation="horizontal">
@@ -15,5 +15,6 @@
         android:layout_gravity="bottom"
         android:layout_weight="1"
         android:elevation="16dp"
+        android:scaleType="centerCrop"
         app:srcCompat="@drawable/card_fronte" />
 </LinearLayout>

@@ -59,16 +59,15 @@
         </LinearLayout>
 
 
-
-
         <LinearLayout
             android:id="@+id/layout_funzioni"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:layout_alignTop="@+id/layout_vantaggi"
-            android:animateLayoutChanges="true">
+            android:animateLayoutChanges="true"
+            android:background="@drawable/backgound_border_top_bottom"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/funzione_telefono"
