@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "613794134960",
+    "firebase_url": "https://euregio-198214.firebaseio.com",
+    "project_id": "euregio-198214",
+    "storage_bucket": "euregio-198214.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:613794134960:android:3280d64494ef24ce",
+        "android_client_info": {
+          "package_name": "com.almaviva.euregio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "613794134960-aofqubtkhvcn9n97lhj0ori7e12j1pi5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeSiBGFBNoJ_1neZT3-wiQmVymxFnUP3I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
