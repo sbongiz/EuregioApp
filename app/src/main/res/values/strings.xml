@@ -19,4 +19,7 @@
     <string name="alfabetico">Alfabetico</string>
     <string name="data_aggiornamento">Data di Aggiornamento</string>
     <string name="risultati">Risultati</string>
+    <string name="avanti">AVANTI</string>
+    <string name="numero_carta">Numero Carta</string>
+    <string name="codice_fiscale">Codice Fiscale</string>
 </resources>

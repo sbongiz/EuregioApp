@@ -2,6 +2,7 @@ package com.almaviva.euregio.fragment;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
 import android.media.Image;
@@ -34,6 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.almaviva.euregio.R;
 
@@ -114,8 +116,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             mBottomSheetBehavior = AnchorBottomSheetBehavior.from(bottomSheet);
 
-
-            mBottomSheetBehavior.setPeekHeight(600);
+            Resources r = getResources();
+            float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, r.getDisplayMetrics());
+            mBottomSheetBehavior.setPeekHeight((int) px);
             mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_HIDDEN);
             previousBottomSheetStatus = 5; // IMPOSTO LO STATO A HIDDEN
             setHasOptionsMenu(true);
@@ -244,6 +247,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             layoutImmagine = view.findViewById(R.id.image_dietro);
             imageBehind = layoutImmagine.findViewById(R.id.image_behind_inside);
 
+
+
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
@@ -295,7 +300,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 if (mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_HIDDEN || mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_EXPANDED) {
                     onMarkerClick = true;
                     mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_COLLAPSED);
-                    mBottomSheetBehavior.setPeekHeight(600);
+                    Resources r = getResources();
+                    float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, r.getDisplayMetrics());
+                    mBottomSheetBehavior.setPeekHeight((int)px);
 
                 }
                 return true;
@@ -323,6 +330,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         TextView esercenteDettaglioIndirizzo = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_indirizzo);
         LinearLayout esercenteDettaglioListaVantaggi = (LinearLayout) vantaggiBrevi.findViewById(R.id.esercente_dettaglio_vantaggi);
         LinearLayout esercenteDettaglioLungo = (LinearLayout) bottomSheet.findViewById(R.id.layout_informazioni);
+        ImageView funzioneTelefono = (ImageView) bottomSheet.findViewById(R.id.funzione_telefono);
+        ImageView funzioneEmail = (ImageView) bottomSheet.findViewById(R.id.funzione_mail);
+        ImageView funzioneSito = (ImageView) bottomSheet.findViewById(R.id.funzione_sito);
+        ImageView funzioneNaviga = (ImageView) bottomSheet.findViewById(R.id.funzione_naviga);
 
         ArrayList<Agreement> listaVantaggi = esercenteSelezionato.properties.agreements;
 
@@ -353,7 +364,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         esercenteDettaglioIndirizzo.setText(esercenteSelezionato.properties.location.properties.description);
 
 
+
+        funzioneTelefono.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:3477453297"));
+                startActivity(callIntent);
+            }
+        });
+
+        funzioneEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("message/rfc822");
+                intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] {"a.sciarretta.tn@gmail.com"});
+                intent.putExtra(Intent.EXTRA_SUBJECT, "k");
+                intent.putExtra(Intent.EXTRA_TEXT, "");
+                Intent mailer = Intent.createChooser(intent, null);
+                startActivity(mailer);
+            }
+        });
+
+        funzioneSito.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = "http://www.example.com";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+
+        funzioneNaviga.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
+
+
 
     public void centerMarker(Marker marker) {
         CameraPosition cameraPosition = new CameraPosition.Builder()

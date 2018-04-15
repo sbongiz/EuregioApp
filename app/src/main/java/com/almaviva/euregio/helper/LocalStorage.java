@@ -28,6 +28,7 @@ public  class LocalStorage {
     public static boolean isDecrescente=false;
     public static String testoCercato;
     public static String testoCercatoMappa;
+    public static boolean isLogged=false;
 
 
     public static void setFiltriCategoriaMappa(ArrayList<Integer> filtriCategoriaMappaNew){
@@ -154,6 +155,15 @@ public  class LocalStorage {
 
     public static String getTestoCercatoMappa(){
         return  testoCercatoMappa;
+    }
+
+
+    public static void setIsLogged(boolean isLoggedNew){
+        isLogged=isLoggedNew;
+    }
+
+    public static boolean getIsLogged(){
+        return  isLogged;
     }
 
 

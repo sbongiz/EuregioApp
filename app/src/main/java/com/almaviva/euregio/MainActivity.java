@@ -9,20 +9,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.almaviva.euregio.adapter.BottomBarAdapter;
 import com.almaviva.euregio.fragment.EuregioFragment;
 import com.almaviva.euregio.fragment.ImpostazioniFragment;
 import com.almaviva.euregio.fragment.ListaFragment;
+import com.almaviva.euregio.fragment.LoginFragment;
 import com.almaviva.euregio.fragment.MapFragment;
 import com.almaviva.euregio.fragment.VantaggiFragment;
+import com.almaviva.euregio.helper.LocalStorage;
 import com.almaviva.euregio.pager.NoSwipePager;
 
-public class MainActivity extends AppCompatActivity implements  VantaggiFragment.OnFragmentInteractionListener,
-                                                                EuregioFragment.OnFragmentInteractionListener,
-                                                                ImpostazioniFragment.OnFragmentInteractionListener,
-                                                                ListaFragment.OnFragmentInteractionListener,
-                                                                MapFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements VantaggiFragment.OnFragmentInteractionListener,
+        EuregioFragment.OnFragmentInteractionListener,
+        ImpostazioniFragment.OnFragmentInteractionListener,
+        ListaFragment.OnFragmentInteractionListener,
+        MapFragment.OnFragmentInteractionListener,
+        LoginFragment.OnFragmentInteractionListener {
 
 
     private BottomNavigationView bottomNavigation;
@@ -30,10 +34,9 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
     private BottomBarAdapter pagerAdapter;
     private ListaFragment listaFragment;
     private EuregioFragment euregioFragment;
+    private LoginFragment loginFragment;
     private ImpostazioniFragment impostazioniFragment;
     private MapFragment mapFragment;
-
-
 
 
     @Override
@@ -46,27 +49,17 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
 
             setComponent();
 
+            checkIfLogged();
+
             viewPager.setPagingEnabled(false);
             pagerAdapter.addFragments(listaFragment);
             pagerAdapter.addFragments(mapFragment);
             pagerAdapter.addFragments(euregioFragment);
             pagerAdapter.addFragments(impostazioniFragment);
+            pagerAdapter.addFragments(loginFragment);
 
             viewPager.setAdapter(pagerAdapter);
 
-            //bottomNavigation.setCurrentItem(0);
-
-
-        //    bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
-        //        @Override
-        //        public void onTabSelected(int position, boolean wasSelected) {
-        //         if(!wasSelected){
-        //          bottomNavigation.setCurrentItem(position);
-        //             viewPager.setCurrentItem(position);
-        //         }
-
-        //        }
-        //    });
 
             bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -75,18 +68,24 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
                     // One possibility of action is to replace the contents above the nav bar
                     // return true if you want the item to be displayed as the selected itemù
                     int id = item.getItemId();
-                    if(id == R.id.navigation_vantaggi){
-                    viewPager.setCurrentItem(0);
+                    if (id == R.id.navigation_vantaggi) {
+                        viewPager.setCurrentItem(0);
                     }
-                    if(id == R.id.navigation_mappa){
+                    if (id == R.id.navigation_mappa) {
                         viewPager.setCurrentItem(1);
                     }
-                    if(id == R.id.navigation_euregio){
-                        viewPager.setCurrentItem(2);
+                    if (id == R.id.navigation_euregio) {
+                        if (LocalStorage.getIsLogged()) {
+                            viewPager.setCurrentItem(2);
+
+                        } else {
+                            viewPager.setCurrentItem(4);
+                        }
                     }
-                    if(id == R.id.navigation_impostazioni){
+                    if (id == R.id.navigation_impostazioni) {
                         viewPager.setCurrentItem(3);
                     }
+
 
                     return true;
                 }
@@ -97,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
         }
     }
 
+    private void checkIfLogged() {
+
+    }
 
     //region SET COMPONENT
     private void setComponent() {
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
             findComponentInView();
             //Initialize the fragment
             setFragment();
+
             //Create the ButtonNavigationMenu
             //createNavigationButton();
             bottomNavigation.setBackground(new ColorDrawable(256));
@@ -125,27 +128,22 @@ public class MainActivity extends AppCompatActivity implements  VantaggiFragment
 
     private void setFragment() {
         listaFragment = new ListaFragment();
+        loginFragment = new LoginFragment();
         euregioFragment = new EuregioFragment();
         impostazioniFragment = new ImpostazioniFragment();
         mapFragment = new MapFragment();
+
     }
 
-
-
-  // private void createNavigationButton() {
-
-  //     try {
-
-  //         AHBottomNavigationItem item1 = new AHBottomNavigationItem(getResources().getString(R.string.title_vantaggi), R.drawable.ic_dashboard_black_24dp);
-  //         AHBottomNavigationItem item2 = new AHBottomNavigationItem(getResources().getString(R.string.title_euregio), R.drawable.ic_home_black_24dp);
-  //         AHBottomNavigationItem item3 = new AHBottomNavigationItem(getResources().getString(R.string.title_impostazioni), R.drawable.ic_notifications_black_24dp);
-  //         bottomNavigation.addItem(item1);
-  //         bottomNavigation.addItem(item2);
-  //         bottomNavigation.addItem(item3);
-  //     } catch (Exception e) {
-  //         Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
-  //     }
-  // }
+ //  @Override
+ //  public void onWindowFocusChanged(boolean hasFocus) {
+ //      super.onWindowFocusChanged(hasFocus);
+ //      if (hasFocus) {
+ //          getWindow().getDecorView().setSystemUiVisibility(
+ //                  View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+ //                          | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+ //      }
+ //  }
     //endregion
 
     //region LISTENER

@@ -453,4 +453,17 @@ public class ListaFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            isFragmentShowing = true;
+        } else {
+            if (isFragmentShowing) {
+                changeSearchToNormalMode();
+            }
+            isFragmentShowing = false;
+        }
+    }
 }
