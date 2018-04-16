@@ -14,6 +14,7 @@
     <string name="tutte">Tutte</string>
     <string name="tutti">Tutti</string>
     <string name="categoria">Categoria</string>
+    <string name="categorie">Categorie</string>
     <string name="comprensorio">Comprensorio</string>
     <string name="ordine">Ordine</string>
     <string name="alfabetico">Alfabetico</string>
@@ -22,4 +23,12 @@
     <string name="avanti">AVANTI</string>
     <string name="numero_carta">Numero Carta</string>
     <string name="codice_fiscale">Codice Fiscale</string>
+    <string name="lingua">Lingua</string>
+    <string name="pagina_home">Maschera di Homepage</string>
+    <string name="pagina_esercenti">Pagina Esercenti</string>
+    <string name="pagina_euregio">Pagina Euregio</string>
+    <string name="visualizzazione_esercenti">Modalità di visualizzazione Esercenti</string>
+    <string name="lista_alfabetica">Lista alfabetica</string>
+    <string name="lista_data">Lista per data aggiornamento</string>
+    <string name="filtri">Filtri</string>
 </resources>

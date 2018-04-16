@@ -54,6 +54,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Text;
 
 import java.lang.reflect.Field;
@@ -312,7 +313,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public void setDettaglioComponentInBottomSheet(Marker currentMarker) {
+    public void setDettaglioComponentInBottomSheet(final Marker currentMarker) {
         String markerSnippet = currentMarker.getSnippet();
         int id = Integer.valueOf(markerSnippet);
 
@@ -400,7 +401,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         funzioneNaviga.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                LatLng position = currentMarker.getPosition();
+                String lat= Double.toString(position.latitude);
+                String lon = Double.toString(position.longitude);
+                Uri gmmIntentUri = Uri.parse("google.navigation:q="+lat+","+lon);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
             }
         });
     }

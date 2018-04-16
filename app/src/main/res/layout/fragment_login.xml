@@ -4,28 +4,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/logo_grande"
         android:layout_width="match_parent"
         android:layout_height="255dp"
         android:layout_marginTop="56dp"
-        app:srcCompat="@drawable/new_icon_euregio_color" />
+        app:srcCompat="@drawable/logo_grande" />
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="185dp"
         android:layout_gravity="bottom|center_vertical"
         android:layout_marginBottom="76dp"
         android:orientation="vertical"
-        android:paddingRight="16dp"
-        android:layout_height="157dp">
+        android:paddingRight="16dp">
 
         <LinearLayout
             android:id="@+id/layout_cod_fisc"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -34,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                app:srcCompat="@drawable/googleg_disabled_color_18" />
+                app:srcCompat="@drawable/logo_card" />
 
             <EditText
                 android:id="@+id/edit_codf"
@@ -49,8 +50,7 @@
         <LinearLayout
             android:id="@+id/layout_num_carta"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <ImageView
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                app:srcCompat="@drawable/icon_euregio" />
+                app:srcCompat="@drawable/logo_codf" />
 
             <EditText
                 android:id="@+id/edit_cardnumber"
@@ -75,6 +75,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:orientation="horizontal">
 

@@ -1,8 +1,10 @@
 package com.almaviva.euregio;
 
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,7 @@ import com.almaviva.euregio.fragment.ImpostazioniFragment;
 import com.almaviva.euregio.fragment.ListaFragment;
 import com.almaviva.euregio.fragment.LoginFragment;
 import com.almaviva.euregio.fragment.MapFragment;
+import com.almaviva.euregio.fragment.SettingsFragment;
 import com.almaviva.euregio.fragment.VantaggiFragment;
 import com.almaviva.euregio.helper.LocalStorage;
 import com.almaviva.euregio.pager.NoSwipePager;
@@ -26,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         ImpostazioniFragment.OnFragmentInteractionListener,
         ListaFragment.OnFragmentInteractionListener,
         MapFragment.OnFragmentInteractionListener,
-        LoginFragment.OnFragmentInteractionListener {
+        LoginFragment.OnFragmentInteractionListener{
 
 
     private BottomNavigationView bottomNavigation;
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
     private EuregioFragment euregioFragment;
     private LoginFragment loginFragment;
     private ImpostazioniFragment impostazioniFragment;
+    private SettingsFragment settingsFragment;
     private MapFragment mapFragment;
 
 
@@ -47,6 +51,10 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         try {
 
 
+            SharedPreferences spref = PreferenceManager.getDefaultSharedPreferences(this);
+
+            String lol = spref.getString("lista_lingue","");
+
             setComponent();
 
             checkIfLogged();
@@ -57,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
             pagerAdapter.addFragments(euregioFragment);
             pagerAdapter.addFragments(impostazioniFragment);
             pagerAdapter.addFragments(loginFragment);
+
 
             viewPager.setAdapter(pagerAdapter);
 
@@ -132,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         euregioFragment = new EuregioFragment();
         impostazioniFragment = new ImpostazioniFragment();
         mapFragment = new MapFragment();
+        settingsFragment = new SettingsFragment();
 
     }
 

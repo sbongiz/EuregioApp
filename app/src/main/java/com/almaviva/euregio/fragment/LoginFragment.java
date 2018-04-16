@@ -21,8 +21,8 @@ public class LoginFragment extends Fragment {
     private EditText editCodFisc;
     private EditText editNumCarta;
     private Button buttonAvanti;
-
-
+    private boolean isfocusedCard=false;
+    private boolean isIsfocusedCodf = false;
     public LoginFragment() {
         // Required empty public constructor
     }
@@ -52,6 +52,8 @@ public class LoginFragment extends Fragment {
                 login();
             }
         });
+
+
 
         return view;
     }
