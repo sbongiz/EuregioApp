@@ -15,6 +15,6 @@ public class SupplierProperties {
     public String phone;
     public String email;
     public String web;
-    public ArrayList<Agreement> agreements;
+    public ArrayList<Product> product;
     public String lastUpdate;
 }

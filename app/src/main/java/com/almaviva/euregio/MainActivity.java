@@ -22,7 +22,14 @@ import com.almaviva.euregio.fragment.MapFragment;
 import com.almaviva.euregio.fragment.SettingsFragment;
 import com.almaviva.euregio.fragment.VantaggiFragment;
 import com.almaviva.euregio.helper.LocalStorage;
+import com.almaviva.euregio.mock.DistrictMock;
+import com.almaviva.euregio.model.District;
 import com.almaviva.euregio.pager.NoSwipePager;
+
+import java.sql.Array;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements VantaggiFragment.OnFragmentInteractionListener,
         EuregioFragment.OnFragmentInteractionListener,
@@ -41,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
     private ImpostazioniFragment impostazioniFragment;
     private SettingsFragment settingsFragment;
     private MapFragment mapFragment;
-
+    private SharedPreferences spref;
+    private String paginaHome;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +59,20 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         try {
 
 
-            SharedPreferences spref = PreferenceManager.getDefaultSharedPreferences(this);
-
-            String lol = spref.getString("lista_lingue","");
+             spref = PreferenceManager.getDefaultSharedPreferences(this);
 
             setComponent();
 
+            //FILTRI
+            setLanguage();
+            setPaginaHome();
+            setOrdinamentoEsercenti();
+            setComprensori();
+
             checkIfLogged();
+
+
+
 
             viewPager.setPagingEnabled(false);
             pagerAdapter.addFragments(listaFragment);
@@ -69,6 +84,15 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
 
             viewPager.setAdapter(pagerAdapter);
 
+
+
+            if(paginaHome.equals(getString(R.string.esercenti))){
+                bottomNavigation.setSelectedItemId(R.id.navigation_vantaggi);
+                viewPager.setCurrentItem(0);
+            }else if(paginaHome.equals(getString(R.string.title_mappa))){
+                bottomNavigation.setSelectedItemId(R.id.navigation_mappa);
+                viewPager.setCurrentItem(1);
+            }
 
             bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -103,6 +127,111 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
+    }
+
+    private void setLanguage(){
+        String lingua = spref.getString("lingua","");
+
+        if(lingua==""){
+            //Al primo avvio controllo la lingua di sistema
+
+            String linguaSistema = Locale.getDefault().getDisplayLanguage().toString();
+
+            if(linguaSistema.equals("Deutsch")){
+                SharedPreferences.Editor  editor = spref.edit();
+                editor.putString("lingua","Deutsch");
+                editor.commit();
+            }else{
+                SharedPreferences.Editor  editor = spref.edit();
+                editor.putString("lingua","Italiano");
+                editor.commit();
+            }
+
+        }else{
+            //Se non è il primo avvio controllo la preferenza della lingua
+
+            if(lingua.equals("Deutsch")){
+                //IMPOSTA TEDESCO
+                SharedPreferences.Editor  editor = spref.edit();
+                editor.putString("lingua","Deutsch");
+                editor.commit();
+            }else{
+                //IMPOSTA ITALIANO
+                SharedPreferences.Editor  editor = spref.edit();
+                editor.putString("lingua","Italiano");
+                editor.commit();
+            }
+        }
+    }
+
+    private void setPaginaHome(){
+        String pagina_home = spref.getString("pagina_home","");
+
+        if(pagina_home.equals("")){
+            SharedPreferences.Editor  editor = spref.edit();
+            editor.putString("pagina_home",getString(R.string.esercenti));
+            editor.commit();
+            paginaHome = getString(R.string.esercenti);
+        }else{
+
+            if(pagina_home.equals(getString(R.string.esercenti))){
+                paginaHome = getString(R.string.esercenti);
+            }else{
+                paginaHome = getString(R.string.title_mappa);
+            }
+
+        }
+
+    }
+
+    private void setOrdinamentoEsercenti(){
+        String ordinamentoEsercenti = spref.getString("ordinamento_esercenti","");
+
+        if(ordinamentoEsercenti.equals("")){
+            SharedPreferences.Editor  editor = spref.edit();
+            editor.putString("ordinamento_esercenti",getString(R.string.lista_data));
+            editor.commit();
+            LocalStorage.setFiltroOrdine(getString(R.string.data_aggiornamento));
+        }else{
+
+            if(ordinamentoEsercenti.equals(getString(R.string.lista_data))){
+                SharedPreferences.Editor  editor = spref.edit();
+                editor.putString("ordinamento_esercenti",getString(R.string.lista_data));
+                editor.commit();
+                LocalStorage.setFiltroOrdine(getString(R.string.data_aggiornamento));
+            }else{
+                SharedPreferences.Editor  editor = spref.edit();
+                editor.putString("ordinamento_esercenti",getString(R.string.lista_alfabetica));
+                editor.commit();
+                LocalStorage.setFiltroOrdine(getString(R.string.alfabetico));
+            }
+
+        }
+    }
+
+    private void setComprensori(){
+
+
+        ArrayList<Integer> arrayCompId = new ArrayList<Integer>();
+        try {
+            for (District dis: DistrictMock.getListMock()) {
+
+                boolean checkPreference = spref.getBoolean("check"+dis.id,false);
+
+                if(checkPreference==true){
+                    arrayCompId.add(dis.id);
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if(arrayCompId.size()>0){
+            LocalStorage.setFiltroComprensorio(arrayCompId);
+            LocalStorage.setIsSetComprensorio(true);
+        }
+
+
     }
 
     private void checkIfLogged() {

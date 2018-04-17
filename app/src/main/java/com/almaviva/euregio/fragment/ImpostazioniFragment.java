@@ -116,8 +116,8 @@ public class ImpostazioniFragment extends Fragment {
 
         for (Category cat : categoryList) {
             CheckBox cb = new CheckBox(getContext());
-            cb.setText(cat.properties.name);
-            cb.setId(cat.properties.id);
+            cb.setText(cat.name);
+            cb.setId(cat.id);
             cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

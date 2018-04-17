@@ -79,8 +79,8 @@ public class FilterHelper {
                 Collections.sort(arrayEsercentiFiltrato, new Comparator<Supplier>() {
                     @Override
                     public int compare(Supplier s1, Supplier s2) {
-                        String prima = s1.properties.title;
-                        String seconda = s2.properties.title;
+                        String prima = s1.title;
+                        String seconda = s2.title;
                         return prima.compareToIgnoreCase(seconda);
                     }
                 });
@@ -88,8 +88,8 @@ public class FilterHelper {
                 Collections.sort(arrayEsercentiFiltrato, new Comparator<Supplier>() {
                     @Override
                     public int compare(Supplier s1, Supplier s2) {
-                        String prima = s1.properties.title;
-                        String seconda = s2.properties.title;
+                        String prima = s1.title;
+                        String seconda = s2.title;
                         return seconda.compareToIgnoreCase(prima);
                     }
                 });
@@ -100,8 +100,8 @@ public class FilterHelper {
                 Collections.sort(arrayEsercentiFiltrato, new Comparator<Supplier>() {
                     @Override
                     public int compare(Supplier s1, Supplier s2) {
-                        String prima = s1.properties.lastUpdate;
-                        String seconda = s2.properties.lastUpdate;
+                        String prima = s1.lastUpdate;
+                        String seconda = s2.lastUpdate;
                         return prima.compareToIgnoreCase(seconda);
                     }
                 });
@@ -109,8 +109,8 @@ public class FilterHelper {
                 Collections.sort(arrayEsercentiFiltrato, new Comparator<Supplier>() {
                     @Override
                     public int compare(Supplier s1, Supplier s2) {
-                        String prima = s1.properties.lastUpdate;
-                        String seconda = s2.properties.lastUpdate;
+                        String prima = s1.lastUpdate;
+                        String seconda = s2.lastUpdate;
                         return seconda.compareToIgnoreCase(prima);
                     }
                 });
@@ -131,7 +131,7 @@ public class FilterHelper {
         arrayEsercentiFiltrato.addAll(arrayEsercenti);
 
         final ArrayList<Integer> listCategorieId = LocalStorage.getFiltriCategoria();
-        Integer comprensorioId = LocalStorage.getFiltriComprensorio();
+        final ArrayList<Integer> listcomprensorioId = LocalStorage.getFiltriComprensorio();
 
         Iterator<Supplier> iter = arrayEsercentiFiltrato.iterator();
 
@@ -140,13 +140,13 @@ public class FilterHelper {
             boolean trovato = false;
             boolean rimosso = false;
             Supplier sup = iter.next();
-            ArrayList<Category> categorieEsercente = sup.properties.categories;
+            ArrayList<Category> categorieEsercente = sup.categories;
 
 
             if (listCategorieId != null) {
                 for (Category cat : categorieEsercente) {
 
-                    if (listCategorieId.contains(cat.properties.id)) {
+                    if (listCategorieId.contains(cat.id)) {
                         trovato = true;
                         break;
                     }
@@ -164,10 +164,10 @@ public class FilterHelper {
                 rimosso = true;
             }
 
-            District comprensorioEsercente = sup.properties.location.properties.district;
+            District comprensorioEsercente = sup.location.district;
 
 
-            if (comprensorioId != 0 && comprensorioId != comprensorioEsercente.properties.id) {
+            if (listcomprensorioId.size()>0 && listcomprensorioId.contains(comprensorioEsercente.id)) {
                 if (!rimosso) {
                     iter.remove();
                 }
@@ -193,13 +193,13 @@ public class FilterHelper {
             boolean trovato = false;
             boolean rimosso = false;
             Supplier sup = iter.next();
-            ArrayList<Category> categorieEsercente = sup.properties.categories;
+            ArrayList<Category> categorieEsercente = sup.categories;
 
 
             if (listCategorieId != null) {
                 for (Category cat : categorieEsercente) {
 
-                    if (listCategorieId.contains(cat.properties.id)) {
+                    if (listCategorieId.contains(cat.id)) {
                         trovato = true;
                         break;
                     }
@@ -255,12 +255,12 @@ public class FilterHelper {
 
         for (Supplier sup: ar) {
 
-            Double lat = Double.parseDouble(sup.properties.location.properties.lat);
-            Double lon = Double.parseDouble(sup.properties.location.properties.lon);
+            Double lat = Double.parseDouble(sup.location.lat);
+            Double lon = Double.parseDouble(sup.location.lon);
             LatLng markerLatLng = new LatLng(lat,lon);
 
-            MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.properties.location.properties.description);
-            String id = Integer.toString(sup.properties.id);
+            MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.location.description);
+            String id = Integer.toString(sup.id);
             markerCorrente.snippet(id);
             mapFragment.googleMap.addMarker(markerCorrente);
 

@@ -5,5 +5,10 @@ package com.almaviva.euregio.model;
  */
 
 public class Location {
-    public LocationProperties properties;
+    public String description;
+    public String municipality;
+    public District district;
+    public String nation;
+    public String lat;
+    public String lon;
 }

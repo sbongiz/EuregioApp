@@ -1,6 +1,7 @@
 package com.almaviva.euregio.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -8,6 +9,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -38,28 +40,30 @@ public class SettingsFragment extends PreferenceFragment {
     private PreferenceCategory categoriaLingua;
     private PreferenceCategory categoriaPush;
     private PreferenceCategory categoriaFiltri;
+    private SharedPreferences spref;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         PreferenceScreen screenPrincipale = getPreferenceManager().createPreferenceScreen(getActivity());
 
         categoriaLingua = new PreferenceCategory(getActivity());
         categoriaLingua.setKey("categoria_lingua");
-        categoriaLingua.setTitle("Lingua");
+        categoriaLingua.setTitle(getString(R.string.lingua));
 
         screenPrincipale.addPreference(categoriaLingua);
 
         categoriaPush = new PreferenceCategory(getActivity());
         categoriaPush.setKey("categoria_push");
-        categoriaPush.setTitle("Push Notification");
+        categoriaPush.setTitle(getString(R.string.push));
         screenPrincipale.addPreference(categoriaPush);
 
         categoriaFiltri = new PreferenceCategory(getActivity());
         categoriaFiltri.setKey("categoria_filtri");
-        categoriaFiltri.setTitle("Filtri");
+        categoriaFiltri.setTitle(getString(R.string.filtri));
         screenPrincipale.addPreference(categoriaFiltri);
 
         createComponentLingua(categoriaLingua);
@@ -89,29 +93,33 @@ public class SettingsFragment extends PreferenceFragment {
 
     private void createComponentVisualizzazione(PreferenceCategory categoriaFiltri){
 
+        String ordinamentoEsercenti = spref.getString("ordinamento_esercenti","");
+
+
         final ListPreference listaVisualizzazione = new ListPreference(getActivity());
 
-        String[] charSequenceLingua = new String[3];
+        String[] charSequenceLingua = new String[2];
 
-        charSequenceLingua[0] = "Mappa";
-        charSequenceLingua[1] = "Lista Alfabetica";
-        charSequenceLingua[2] = "Lista Data Aggiornamento";
+        charSequenceLingua[0] = getString(R.string.lista_alfabetica);
+        charSequenceLingua[1] = getString(R.string.lista_data);
 
-        listaVisualizzazione.setKey("lista_visualizzazione");
-        listaVisualizzazione.setTitle("Visualizzazione Esercenti");
+        listaVisualizzazione.setKey("ordinamento_esercenti");
+        listaVisualizzazione.setTitle(getString(R.string.visualizzazione_esercenti));
 
-        listaVisualizzazione.setDialogTitle("Visualizzazione Esercenti");
+        listaVisualizzazione.setDialogTitle(getString(R.string.visualizzazione_esercenti));
         listaVisualizzazione.setEntries(charSequenceLingua);
         listaVisualizzazione.setEntryValues(charSequenceLingua);
         listaVisualizzazione.setDefaultValue(charSequenceLingua[0]);
-
-        listaVisualizzazione.setSummary(charSequenceLingua[0]);
+        listaVisualizzazione.setValue(ordinamentoEsercenti);
+        listaVisualizzazione.setSummary(ordinamentoEsercenti);
 
         listaVisualizzazione.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 listaVisualizzazione.setValue(newValue.toString());
                 listaVisualizzazione.setSummary(newValue.toString());
+                spref.edit().putString("ordinamento_esercenti",newValue.toString());
+                spref.edit().commit();
                 return false;
             }
         });
@@ -120,27 +128,32 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     private void createComponentMascheraIniziale(PreferenceCategory categoriaFiltri) {
+        String paginaHome = spref.getString("pagina_home","");
+
        final ListPreference listaMaschere = new ListPreference(getActivity());
 
         String[] charSequenceLingua = new String[2];
 
-        charSequenceLingua[0] = "Esercenti";
-        charSequenceLingua[1] = "Mappa";
+        charSequenceLingua[0] = getString(R.string.esercenti);
+        charSequenceLingua[1] = getString(R.string.title_mappa);
 
-        listaMaschere.setKey("lista_maschera");
-        listaMaschere.setTitle("Maschera Iniziale");
+        listaMaschere.setKey("pagina_home");
+        listaMaschere.setTitle(getString(R.string.pagina_home));
 
-        listaMaschere.setDialogTitle("Maschera Iniziale");
+        listaMaschere.setDialogTitle(getString(R.string.pagina_home));
         listaMaschere.setEntries(charSequenceLingua);
         listaMaschere.setEntryValues(charSequenceLingua);
         listaMaschere.setDefaultValue(charSequenceLingua[0]);
-        listaMaschere.setSummary(charSequenceLingua[0]);
+        listaMaschere.setSummary(paginaHome);
+        listaMaschere.setValue(paginaHome);
 
         listaMaschere.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 listaMaschere.setValue(newValue.toString());
                 listaMaschere.setSummary(newValue.toString());
+                spref.edit().putString("pagina_home",newValue.toString());
+                spref.edit().commit();
                 return false;
             }
         });
@@ -151,7 +164,7 @@ public class SettingsFragment extends PreferenceFragment {
     private void createComponentPush(PreferenceCategory categoriaPush) {
 
         CheckBoxPreference checkBoxPref = new CheckBoxPreference(getActivity());
-        checkBoxPref.setSummary("Ricevi notifiche Push");
+        checkBoxPref.setSummary(getString(R.string.push));
         checkBoxPref.setChecked(true);
 
         categoriaPush.addPreference(checkBoxPref);
@@ -160,25 +173,31 @@ public class SettingsFragment extends PreferenceFragment {
 
     private void createComponentLingua(final PreferenceCategory categoriaLingua) {
 
+
+        String lingua = spref.getString("lingua","");
+
         final ListPreference listaLingue = new ListPreference(getActivity());
 
         String[] charSequenceLingua = new String[2];
 
         charSequenceLingua[0] = "Italiano";
-        charSequenceLingua[1] = "Deautche";
+        charSequenceLingua[1] = "Deutsch";
 
-        listaLingue.setKey("lista_lingue");
-        listaLingue.setDialogTitle("Lingua");
+        listaLingue.setKey("lingua");
+        listaLingue.setDialogTitle(getString(R.string.lingua));
         listaLingue.setEntries(charSequenceLingua);
         listaLingue.setEntryValues(charSequenceLingua);
-
-        listaLingue.setSummary(charSequenceLingua[0]);
+        listaLingue.setValue(lingua);
+        listaLingue.setSummary(lingua);
 
         listaLingue.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 listaLingue.setValue(newValue.toString());
                 listaLingue.setSummary(newValue.toString());
+                spref.edit().putString("lingua",newValue.toString());
+                spref.edit().commit();
+
                 return false;
             }
         });
@@ -196,7 +215,8 @@ public class SettingsFragment extends PreferenceFragment {
 
         for (District dis : DistrictMock.getListMock()) {
             CheckBoxPreference checkBoxPref = new CheckBoxPreference(getActivity());
-            checkBoxPref.setSummary(dis.properties.name);
+            checkBoxPref.setKey("check"+dis.id);
+            checkBoxPref.setSummary(dis.name);
             checkBoxPref.setChecked(false);
             screenCategory.addPreference(checkBoxPref);
         }

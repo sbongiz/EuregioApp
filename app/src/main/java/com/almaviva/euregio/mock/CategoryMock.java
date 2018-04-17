@@ -23,7 +23,7 @@ public class CategoryMock {
         categoryProperties.name="Alimentari";
 
         Category cat = new Category();
-        cat.properties = categoryProperties;
+       // cat.properties = categoryProperties;
         categoryArrayList.add(cat);
 
 
@@ -34,7 +34,7 @@ public class CategoryMock {
         categoryProperties1.name="Casalinghi e abitare";
 
         Category cat1 = new Category();
-        cat1.properties = categoryProperties1;
+        //cat1.properties = categoryProperties1;
         categoryArrayList.add(cat1);
 
 
@@ -44,7 +44,7 @@ public class CategoryMock {
         categoryProperties2.name="Vestiti";
 
         Category cat2 = new Category();
-        cat2.properties = categoryProperties2;
+      //  cat2.properties = categoryProperties2;
         categoryArrayList.add(cat2);
 
 
@@ -54,7 +54,7 @@ public class CategoryMock {
         categoryProperties3.name="Trasporti";
 
         Category cat3 = new Category();
-        cat3.properties = categoryProperties3;
+        //cat3.properties = categoryProperties3;
         categoryArrayList.add(cat3);
 
 
@@ -64,7 +64,7 @@ public class CategoryMock {
         categoryProperties4.name="Infanzia e giocattoli";
 
         Category cat4 = new Category();
-        cat4.properties = categoryProperties4;
+     //   cat4.properties = categoryProperties4;
         categoryArrayList.add(cat4);
 
 
@@ -75,7 +75,7 @@ public class CategoryMock {
         categoryProperties5.name="Gastornomia/hotel/strutture ricettive";
 
         Category cat5 = new Category();
-        cat5.properties = categoryProperties5;
+       // cat5.properties = categoryProperties5;
         categoryArrayList.add(cat5);
 
 
@@ -85,7 +85,7 @@ public class CategoryMock {
         categoryProperties6.name="Formazione";
 
         Category cat6 = new Category();
-        cat6.properties = categoryProperties6;
+   //     cat6.properties = categoryProperties6;
         categoryArrayList.add(cat6);
 
 
@@ -96,7 +96,7 @@ public class CategoryMock {
         categoryProperties7.name="Tempo libero/cultura/sport";
 
         Category cat7 = new Category();
-        cat7.properties = categoryProperties7;
+   //     cat7.properties = categoryProperties7;
         categoryArrayList.add(cat7);
 
 
@@ -108,7 +108,7 @@ public class CategoryMock {
         categoryProperties8.name="Cartolibreria";
 
         Category cat8 = new Category();
-        cat8.properties = categoryProperties8;
+     //   cat8.properties = categoryProperties8;
         categoryArrayList.add(cat8);
 
 
@@ -118,7 +118,7 @@ public class CategoryMock {
         categoryProperties9.name="Comunicazione";
 
         Category cat9 = new Category();
-        cat9.properties = categoryProperties9;
+    //    cat9.properties = categoryProperties9;
         categoryArrayList.add(cat9);
 
 
@@ -129,7 +129,7 @@ public class CategoryMock {
         categoryProperties10.name="Salute e bellezza";
 
         Category cat10 = new Category();
-        cat10.properties = categoryProperties10;
+     //   cat10.properties = categoryProperties10;
         categoryArrayList.add(cat10);
 
 
@@ -140,7 +140,7 @@ public class CategoryMock {
         categoryProperties11.name="Banche ed assicurazioni";
 
         Category cat11 = new Category();
-        cat11.properties = categoryProperties11;
+    //    cat11.properties = categoryProperties11;
         categoryArrayList.add(cat11);
 
 
@@ -151,7 +151,7 @@ public class CategoryMock {
         categoryProperties12.name="Altro";
 
         Category cat12 = new Category();
-        cat12.properties = categoryProperties12;
+    //    cat12.properties = categoryProperties12;
         categoryArrayList.add(cat12);
 
         return categoryArrayList;

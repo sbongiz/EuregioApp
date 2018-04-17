@@ -5,5 +5,6 @@ package com.almaviva.euregio.model;
  */
 
 public class Category {
-    public CategoryProperties properties;
+    public int id;
+    public String name;
 }

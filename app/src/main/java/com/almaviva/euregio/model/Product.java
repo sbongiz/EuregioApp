@@ -6,17 +6,19 @@ import java.text.ParseException;
  * Created by a.sciarretta on 28/03/2018.
  */
 
-public class Agreement {
+public class Product {
 
 
-    public AgreementProperties properties;
+    public int id;
+    public String description;
+    public String descriptionShort;
 
 
     public String getDescriptionShort() {
-        return this.properties.descriptionShort;
+        return this.descriptionShort;
     }
 
     public void setDescriptionShort(String descriptionShort){
-        this.properties.descriptionShort = descriptionShort;
+        this.descriptionShort = descriptionShort;
     }
 }

@@ -17,7 +17,7 @@ public  class LocalStorage {
 
     public static ArrayList<Integer> filtriCategoria = new ArrayList<Integer>();
     public static ArrayList<Integer> filtriCategoriaMappa = new ArrayList<Integer>();
-    public static Integer filtroComprensorio=null;
+    public static ArrayList<Integer> filtroComprensorio=null;
     public static String filtroOrdine = null;
     public static boolean isSetCategoria=false;
     public static boolean isSetCategoriaMappa= false;
@@ -48,10 +48,10 @@ public  class LocalStorage {
     }
 
 
-    public static void  setFiltroComprensorio(Integer filtroComprensorioNew){
+    public static void  setFiltroComprensorio(ArrayList<Integer> filtroComprensorioNew){
         filtroComprensorio = filtroComprensorioNew;
     }
-    public static Integer getFiltriComprensorio(){
+    public static ArrayList<Integer> getFiltriComprensorio(){
         return  filtroComprensorio;
     }
 

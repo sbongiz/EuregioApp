@@ -5,6 +5,4 @@ package com.almaviva.euregio.helper;
  */
 
 public class FilterSettings {
-
-
 }

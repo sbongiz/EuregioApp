@@ -1,6 +1,7 @@
 package com.almaviva.euregio.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -61,6 +62,16 @@ public class LoginFragment extends Fragment {
     private void login(){
         String codiceFiscale = editCodFisc.getText().toString();
         String numeroCarta = editNumCarta.getText().toString();
+        SharedPreferences sharedref = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        if(sharedref.getBoolean("isLogged",false)==false){
+            SharedPreferences.Editor  editor = sharedref.edit();
+            editor.putBoolean("isLogged",true);
+        }else{
+            SharedPreferences.Editor  editor = sharedref.edit();
+            editor.putBoolean("isLogged",false);
+        }
+
 
     }
 

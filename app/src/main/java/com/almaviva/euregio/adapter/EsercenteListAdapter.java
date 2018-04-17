@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.almaviva.euregio.R;
-import com.almaviva.euregio.model.Agreement;
+import com.almaviva.euregio.model.Product;
 import com.almaviva.euregio.model.Esercente;
 import com.almaviva.euregio.model.Supplier;
 
@@ -86,7 +86,7 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         if(holder.linearLayoutVantaggi.getChildAt(0) == null) {
             LinearLayout a = new LinearLayout(context);
             a.setOrientation(LinearLayout.VERTICAL);
-            for (Agreement vantaggio : listOfEsercenti.get(position).properties.agreements) {
+            for (Product vantaggio : listOfEsercenti.get(position).products) {
                 TextView textTmp = new TextView(context);
                 textTmp.setText(vantaggio.getDescriptionShort());
                 textTmp.setTextColor(context.getResources().getColor(R.color.colorPrimary));

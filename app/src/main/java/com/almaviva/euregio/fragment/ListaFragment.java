@@ -3,11 +3,13 @@ package com.almaviva.euregio.fragment;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -73,6 +75,7 @@ public class ListaFragment extends Fragment {
     private boolean isFragmentShowing = false;
     public boolean isSearchWhite = false;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
+    private SharedPreferences spref;
 
 
     public ListaFragment() {
@@ -83,14 +86,18 @@ public class ListaFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         View view = inflater.inflate(R.layout.fragment_lista, container, false);
         try {
             setHasOptionsMenu(true);
@@ -102,7 +109,9 @@ public class ListaFragment extends Fragment {
 
             setFiltriDaImpostazioni();
 
-            textViewNumeroRisultati.setText(esercentiArrayList.size() + " " + getString(R.string.risultati));
+            FilterHelper.filtraTotale(getActivity());
+
+
 
 
             //LISTENER
@@ -157,10 +166,12 @@ public class ListaFragment extends Fragment {
     }
 
 
-    private void setFiltriDaImpostazioni(){
-        LocalStorage.setFiltroOrdine(getString(R.string.alfabetico));
-        LocalStorage.setFiltroComprensorio(0);
+    private void setFiltriDaImpostazioni() {
+
+
+        textViewFiltroOrdine.setText(LocalStorage.getFiltriOrdine());
         LocalStorage.setTestoCercato("");
+
     }
 
     private void animateIconaFiltro() {
@@ -208,6 +219,7 @@ public class ListaFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -241,7 +253,7 @@ public class ListaFragment extends Fragment {
             esercentiArrayList = new ArrayList<Supplier>();
 
             if (LocalStorage.getListOfEsercentiFiltrata().size() == 0) {
-                esercentiArrayList = SupplierMock.getListMock();
+                esercentiArrayList = SupplierMock.getListaSupplier();
                 LocalStorage.setListOfEsercenti(esercentiArrayList);
             } else {
                 esercentiArrayList = LocalStorage.getListOfEsercentiFiltrata();
@@ -263,9 +275,6 @@ public class ListaFragment extends Fragment {
         esercentiList.setDivider(null);
         esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Supplier>());
         esercentiList.setAdapter(esercenteListAdapter);
-
-        textViewFiltroOrdine.setText(getString(R.string.alfabetico));
-
     }
 
     private void findComponentInView(View view) {
@@ -283,6 +292,7 @@ public class ListaFragment extends Fragment {
             toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
             filter = menu.findItem(R.id.filter);
             searchClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
@@ -298,7 +308,7 @@ public class ListaFragment extends Fragment {
 
         customizeSearchView();
 
-
+        changeSearchToNormalMode();
         //region MENU LISTENER
         final SupportMenuItem menuNonCompat = (SupportMenuItem) menu.findItem(R.id.searchView);
 
@@ -347,12 +357,7 @@ public class ListaFragment extends Fragment {
                 };
 
                 handler.removeCallbacks(runnable);
-
-
-
                 handler.postDelayed(runnable, 5000);
-
-
                 return false;
 
             }
@@ -378,14 +383,16 @@ public class ListaFragment extends Fragment {
         }
     }
 
+
+
     private void changeSearchToNormalMode() {
         Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
 
-        if(numero_risultati ==1){
+        if (numero_risultati == 1) {
             filter.setIcon(R.drawable.icon_settingswhite1);
-        }else if(numero_risultati ==2){
+        } else if (numero_risultati == 2) {
             filter.setIcon(R.drawable.icon_settingswhite2);
-        }else{
+        } else {
             filter.setIcon(R.drawable.icon_settingswhite);
         }
 
@@ -403,11 +410,11 @@ public class ListaFragment extends Fragment {
 
         Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
 
-        if(numero_risultati ==1){
+        if (numero_risultati == 1) {
             filter.setIcon(R.drawable.icon_settingsgray1);
-        }else if(numero_risultati ==2){
+        } else if (numero_risultati == 2) {
             filter.setIcon(R.drawable.icon_settingsgray2);
-        }else{
+        } else {
             filter.setIcon(R.drawable.icon_settingsgrey);
         }
         if (transition == null) {
@@ -454,11 +461,13 @@ public class ListaFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
             isFragmentShowing = true;
+
         } else {
             if (isFragmentShowing) {
                 changeSearchToNormalMode();

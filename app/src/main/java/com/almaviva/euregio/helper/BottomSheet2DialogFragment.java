@@ -28,6 +28,7 @@ import com.almaviva.euregio.model.District;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by a.sciarretta on 13/04/2018.
@@ -45,7 +46,6 @@ public class BottomSheet2DialogFragment extends android.support.design.widget.Bo
     private LinearLayout scrollViewCategorie;
     private ArrayList<Integer> filtriSelezionatiCategoriaId;
     private ProgressBar loading;
-
 
 
     private CharSequence titleFiltroCategorie = "";
@@ -109,10 +109,9 @@ public class BottomSheet2DialogFragment extends android.support.design.widget.Bo
         });
 
 
-
     }
 
-    private void getComponentInView(View contentView){
+    private void getComponentInView(View contentView) {
         iconaExpand = contentView.findViewById(R.id.icona_expand);
         categoryRadioGroup = (RadioGroup) contentView.findViewById(R.id.radioGroup_category);
         filtroSelezionato = (TextView) contentView.findViewById(R.id.textView_filtro_selezionato);
@@ -178,8 +177,8 @@ public class BottomSheet2DialogFragment extends android.support.design.widget.Bo
 
         for (Category cat : categoryList) {
             CheckBox cb = new CheckBox(getContext());
-            cb.setText(cat.properties.name);
-            cb.setId(cat.properties.id);
+            cb.setText(cat.name);
+            cb.setId(cat.id);
             cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -187,18 +186,18 @@ public class BottomSheet2DialogFragment extends android.support.design.widget.Bo
                     if (filtriSelezionatiCategoriaId == null) {
                         filtriSelezionatiCategoriaId = new ArrayList<Integer>();
                     }
-                    if (!filtriSelezionatiCategoriaId.contains(buttonView.getId()) &&isChecked) {
+                    if (!filtriSelezionatiCategoriaId.contains(buttonView.getId()) && isChecked) {
                         filtriSelezionatiCategoriaId.add(buttonView.getId());
-                    }else if(filtriSelezionatiCategoriaId.contains(buttonView.getId()) && !isChecked){
-                        filtriSelezionatiCategoriaId.remove( filtriSelezionatiCategoriaId.indexOf(buttonView.getId()));
+                    } else if (filtriSelezionatiCategoriaId.contains(buttonView.getId()) && !isChecked) {
+                        filtriSelezionatiCategoriaId.remove(filtriSelezionatiCategoriaId.indexOf(buttonView.getId()));
                     }
 
-                    if(filtriSelezionatiCategoriaId.size()==0){
+                    if (filtriSelezionatiCategoriaId.size() == 0) {
                         LocalStorage.setIsSetCategoriaMappa(false);
-                    }else{
+                    } else {
                         LocalStorage.setIsSetCategoriaMappa(true);
                     }
-                    Log.e("FILTRI NUMERO",LocalStorage.getNumberOfFilterSetMappa().toString());
+                    Log.e("FILTRI NUMERO", LocalStorage.getNumberOfFilterSetMappa().toString());
                     setIconaFiltroMenu();
                     LocalStorage.setFiltriCategoriaMappa(filtriSelezionatiCategoriaId);
                     filtraListaEsercenti();
@@ -222,26 +221,34 @@ public class BottomSheet2DialogFragment extends android.support.design.widget.Bo
     }
 
 
-    private void setIconaFiltroMenu(){
+    private void setIconaFiltroMenu() {
 
-        int numero_filtri_impostati  = LocalStorage.getNumberOfFilterSetMappa();
+        int numero_filtri_impostati = LocalStorage.getNumberOfFilterSetMappa();
 
         MainActivity mainActivity = (MainActivity) getActivity();
         List<Fragment> fra = mainActivity.getSupportFragmentManager().getFragments();
-        MapFragment mapFragment = (MapFragment) fra.get(1);
+        MapFragment mapFragment = null;
 
 
-        if(numero_filtri_impostati==1){
-            if(mapFragment.isSearchWhite){
-                mapFragment.filter.setIcon(R.drawable.icon_settingsgray1);
-            }else{
-                mapFragment.filter.setIcon(R.drawable.icon_settingswhite1);
+        for (Fragment f : fra) {
+
+            if (f!=null && f.getClass().toString().equals("class com.almaviva.euregio.fragment.MapFragment")) {
+                mapFragment = (MapFragment) f;
             }
-        }else{
-            if(mapFragment.isSearchWhite){
-                mapFragment.filter.setIcon(R.drawable.icon_settingsgrey);
-            }else{
-                mapFragment.filter.setIcon(R.drawable.icon_settingswhite);
+        }
+        if (mapFragment != null) {
+            if (numero_filtri_impostati == 1) {
+                if (mapFragment.isSearchWhite) {
+                    mapFragment.filter.setIcon(R.drawable.icon_settingsgray1);
+                } else {
+                    mapFragment.filter.setIcon(R.drawable.icon_settingswhite1);
+                }
+            } else {
+                if (mapFragment.isSearchWhite) {
+                    mapFragment.filter.setIcon(R.drawable.icon_settingsgrey);
+                } else {
+                    mapFragment.filter.setIcon(R.drawable.icon_settingswhite);
+                }
             }
         }
     }
@@ -260,13 +267,13 @@ public class BottomSheet2DialogFragment extends android.support.design.widget.Bo
 
             selectedRadioButton.setChecked(true);
         }
-        if(titleFiltroCategorie==""){
+        if (titleFiltroCategorie == "") {
             titleFiltroCategorie = getString(R.string.tutte);
         }
     }
 
 
-    public void filtraListaEsercenti(){
+    public void filtraListaEsercenti() {
 
         loading.setVisibility(View.VISIBLE);
         FilterHelper.filtraSuMappa(getActivity());
@@ -274,7 +281,6 @@ public class BottomSheet2DialogFragment extends android.support.design.widget.Bo
 
 
     }
-
 
 
     //region Animazioni

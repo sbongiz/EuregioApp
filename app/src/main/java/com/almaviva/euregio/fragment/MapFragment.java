@@ -37,13 +37,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.almaviva.euregio.MainActivity;
 import com.almaviva.euregio.R;
 
 import com.almaviva.euregio.behavior.AnchorBottomSheetBehavior;
 import com.almaviva.euregio.helper.BottomSheet2DialogFragment;
 import com.almaviva.euregio.helper.BottomSheet3DialogFragment;
 import com.almaviva.euregio.helper.LocalStorage;
-import com.almaviva.euregio.model.Agreement;
+import com.almaviva.euregio.model.Product;
+import com.almaviva.euregio.model.Product;
 import com.almaviva.euregio.model.Supplier;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -59,6 +61,7 @@ import org.w3c.dom.Text;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -82,6 +85,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public static GoogleMap googleMap;
     private LinearLayout layoutImmagine;
     private ImageView imageBehind;
+    private LinearLayout layoutTelefono;
+    private LinearLayout layoutMail;
+    private LinearLayout layoutSito;
+    private LinearLayout layoutIndicazioni;
 
     private int previousBottomSheetStatus;
 
@@ -274,12 +281,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         for (Supplier sup : LocalStorage.getListOfEsercentiFiltrataMappa()) {
 
-            Double lat = Double.parseDouble(sup.properties.location.properties.lat);
-            Double lon = Double.parseDouble(sup.properties.location.properties.lon);
+            Double lat = Double.parseDouble(sup.location.lat);
+            Double lon = Double.parseDouble(sup.location.lon);
             LatLng markerLatLng = new LatLng(lat, lon);
 
-            MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.properties.location.properties.description);
-            String id = Integer.toString(sup.properties.id);
+            MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.location.description);
+            String id = Integer.toString(sup.id);
             markerCorrente.snippet(id);
             googleMap.addMarker(markerCorrente);
         }
@@ -321,7 +328,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         for (Supplier sup : LocalStorage.getListOfEsercentiFiltrataMappa()) {
 
-            if (sup.properties.id == id) {
+            if (sup.id == id) {
                 esercenteSelezionato = sup;
             }
         }
@@ -331,22 +338,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         TextView esercenteDettaglioIndirizzo = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_indirizzo);
         LinearLayout esercenteDettaglioListaVantaggi = (LinearLayout) vantaggiBrevi.findViewById(R.id.esercente_dettaglio_vantaggi);
         LinearLayout esercenteDettaglioLungo = (LinearLayout) bottomSheet.findViewById(R.id.layout_informazioni);
-        ImageView funzioneTelefono = (ImageView) bottomSheet.findViewById(R.id.funzione_telefono);
-        ImageView funzioneEmail = (ImageView) bottomSheet.findViewById(R.id.funzione_mail);
-        ImageView funzioneSito = (ImageView) bottomSheet.findViewById(R.id.funzione_sito);
-        ImageView funzioneNaviga = (ImageView) bottomSheet.findViewById(R.id.funzione_naviga);
+        layoutTelefono = (LinearLayout) bottomSheet.findViewById(R.id.layout_telefono);
+        layoutMail = (LinearLayout) bottomSheet.findViewById(R.id.layout_mail);
+        layoutSito = (LinearLayout) bottomSheet.findViewById(R.id.layout_sito);
+        layoutIndicazioni = (LinearLayout) bottomSheet.findViewById(R.id.layout_indicazioni);
 
-        ArrayList<Agreement> listaVantaggi = esercenteSelezionato.properties.agreements;
+        ArrayList<Product> listaVantaggi = esercenteSelezionato.products;
 
         esercenteDettaglioListaVantaggi.removeAllViews();
         esercenteDettaglioLungo.removeAllViews();
 
-        for (Agreement vant : listaVantaggi) {
+        for (Product vant : listaVantaggi) {
 
             TextView textTmp = new TextView(getActivity());
             TextView textTmpLunga = new TextView(getActivity());
             textTmp.setText(vant.getDescriptionShort());
-            textTmpLunga.setText(vant.properties.description);
+            textTmpLunga.setText(vant.description);
             textTmp.setTextColor(getResources().getColor(R.color.colorPrimary));
             textTmpLunga.setTextColor(getResources().getColor(R.color.colorPrimary));
             textTmp.setTextSize(13);
@@ -360,13 +367,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
 
-        esercenteDettaglioTitolo.setText(esercenteSelezionato.properties.title);
-        esercenteDettaglioData.setText(esercenteSelezionato.properties.lastUpdate);
-        esercenteDettaglioIndirizzo.setText(esercenteSelezionato.properties.location.properties.description);
+        esercenteDettaglioTitolo.setText(esercenteSelezionato.title);
+        esercenteDettaglioData.setText(esercenteSelezionato.lastUpdate);
+        esercenteDettaglioIndirizzo.setText(esercenteSelezionato.location.description);
 
 
 
-        funzioneTelefono.setOnClickListener(new View.OnClickListener() {
+        layoutTelefono.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -375,7 +382,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        funzioneEmail.setOnClickListener(new View.OnClickListener() {
+        layoutMail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
@@ -388,7 +395,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        funzioneSito.setOnClickListener(new View.OnClickListener() {
+        layoutSito.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = "http://www.example.com";
@@ -398,7 +405,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        funzioneNaviga.setOnClickListener(new View.OnClickListener() {
+        layoutIndicazioni.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 LatLng position = currentMarker.getPosition();
@@ -465,6 +472,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         customizeSearchView();
 
+        changeSearchToNormalMode();
+
         //region MENU LISTENER
         final SupportMenuItem menuNonCompat = (SupportMenuItem) menu.findItem(R.id.searchView);
 
@@ -524,6 +533,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
+
+
     private void changeSearchToNormalMode() {
 
         Integer numero_risultati = LocalStorage.getNumberOfFilterSetMappa();
@@ -543,7 +554,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             transition.reverseTransition(300);
         }
         isSearchWhite = false;
-    }
+}
 
     private void changeSearchToWhiteMode() {
 
@@ -601,7 +612,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             isFragmentShowing = true;
         } else {
             if (isFragmentShowing) {
-                changeSearchToNormalMode();
+            changeSearchToNormalMode();
             }
             isFragmentShowing = false;
         }
