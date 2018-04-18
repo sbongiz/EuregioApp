@@ -1,15 +1,19 @@
 package com.almaviva.euregio.fragment;
 
+import android.Manifest;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
+import android.location.Location;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.internal.view.SupportMenuItem;
@@ -32,6 +36,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.almaviva.euregio.R;
 
 import com.almaviva.euregio.behavior.AnchorBottomSheetBehavior;
@@ -39,6 +44,8 @@ import com.almaviva.euregio.helper.BottomSheet2DialogFragment;
 import com.almaviva.euregio.helper.LocalStorage;
 import com.almaviva.euregio.model.Product;
 import com.almaviva.euregio.model.Supplier;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -47,6 +54,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -77,7 +85,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private LinearLayout layoutMail;
     private LinearLayout layoutSito;
     private LinearLayout layoutIndicazioni;
-
+    private FusedLocationProviderClient mFusedLocationClient;
     private int previousBottomSheetStatus;
 
     private LinearLayout layoutBottomSheet;
@@ -89,7 +97,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
-
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         super.onCreate(savedInstanceState);
     }
 
@@ -196,6 +204,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             });
 //endregion
 
+
+
+
+
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
@@ -244,7 +256,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             imageBehind = layoutImmagine.findViewById(R.id.image_behind_inside);
 
 
-
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
@@ -265,6 +276,33 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap mappa) {
         googleMap = mappa;
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }else{
+            googleMap.setMyLocationEnabled(true);
+
+
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                LatLng myLocation = new LatLng(location.getLongitude(),location.getLatitude());
+                                LocalStorage.setMyLastKnownLocation(myLocation);
+                            }
+                        }
+                    });
+
+        }
 
 
         for (Supplier sup : LocalStorage.getListOfEsercentiFiltrataMappa()) {
@@ -309,6 +347,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 return true;
             }
         });
+
+
+
         //endregion
     }
 

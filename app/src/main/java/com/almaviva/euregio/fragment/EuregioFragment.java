@@ -19,6 +19,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import com.almaviva.euregio.MainActivity;
 import com.almaviva.euregio.R;
 
 import java.io.File;
@@ -126,6 +127,9 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
                 editor.commit();
                 editor.putString("card_retro_path", "");
                 editor.commit();
+
+                MainActivity main = (MainActivity) getActivity();
+                main.bottomNavigation.setSelectedItemId(R.id.navigation_euregio);
 
             }
         });

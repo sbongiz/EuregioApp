@@ -77,7 +77,7 @@
                             android:id="@+id/textView_filtro"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/categoria"
+                            android:text="@string/categorie"
                             android:textColor="@color/principalText"
                             android:textSize="16dp" />
 

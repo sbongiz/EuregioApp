@@ -55,6 +55,7 @@ import com.almaviva.euregio.model.OrdineFiltro;
 import com.almaviva.euregio.model.Supplier;
 import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -85,17 +86,16 @@ public class ListaFragment extends Fragment {
     private SearchManager searchManager;
     private SearchView searchView;
     public static MenuItem filter;
-    private TextView badgeTextView;
     private ImageView searchClose;
     private TransitionDrawable transition;
     private boolean isFragmentShowing = false;
     public boolean isSearchWhite = false;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
-    private SharedPreferences spref;
-    //public static ProgressBar progressBarLista;
+    public static Context activity;
     public static String risultati;
     public static String risultato;
     public static SwipeRefreshLayout swipeLayout;
+    public static  SharedPreferences spref;
 
 
     public ListaFragment() {
@@ -115,19 +115,17 @@ public class ListaFragment extends Fragment {
         // Inflate the layout for this fragment
 
         spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
+        activity= getContext();
         View view = inflater.inflate(R.layout.fragment_lista, container, false);
         try {
             setHasOptionsMenu(true);
             risultati = getString(R.string.risultati);
-            risultato= getString(R.string.risultato);
+            risultato = getString(R.string.risultato);
             findComponentInView(view);
             setComponent();
             getEsercenti();
 
             setFiltriDaImpostazioni();
-
-            FilterHelper.filtraTotale(getActivity());
 
 
             //LISTENER
@@ -183,7 +181,6 @@ public class ListaFragment extends Fragment {
 
 
     private void setFiltriDaImpostazioni() {
-
 
         textViewFiltroOrdine.setText(LocalStorage.getFiltriOrdine());
         LocalStorage.setTestoCercato("");
@@ -268,19 +265,15 @@ public class ListaFragment extends Fragment {
         try {
             esercentiArrayList = new ArrayList<Supplier>();
 
-            if (LocalStorage.getListOfEsercentiFiltrata().size() == 0) {
+
+            if (LocalStorage.getListOfEsercenti().size() == 0) {
                 retriveFilterAsyncTask();
-                LocalStorage.setListOfEsercenti(esercentiArrayList);
-            } else {
-                esercentiArrayList = LocalStorage.getListOfEsercentiFiltrata();
+            }else{
+                FilterHelper.filtraTotale(getActivity());
             }
 
-            esercenteListAdapter.add(esercentiArrayList);
-            esercenteListAdapter.notifyDataSetChanged();
 
-            if (LocalStorage.getListOfEsercentiFiltrata().size() == 0) {
-                LocalStorage.setListOfEsercentiFiltrata(esercentiArrayList);
-            }
+
 
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
@@ -293,11 +286,10 @@ public class ListaFragment extends Fragment {
         esercentiList.setAdapter(esercenteListAdapter);
 
 
-
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                        retriveFilterAsyncTask();
+                retriveFilterAsyncTask();
             }
         });
 
@@ -412,8 +404,6 @@ public class ListaFragment extends Fragment {
     }
 
 
-
-
     private void changeSearchToNormalMode() {
         Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
 
@@ -506,47 +496,56 @@ public class ListaFragment extends Fragment {
     }
 
 
-    public static void  retriveFilterAsyncTask (){
+    public static void retriveFilterAsyncTask() {
 
-       // progressBarLista.setVisibility(View.VISIBLE);
+        // progressBarLista.setVisibility(View.VISIBLE);
         esercentiArrayList = new ArrayList<Supplier>();
-            SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    // If the response is JSONObject instead of expected JSONArray
-                }
 
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                    // Pull out the first event on the public timeline
-                    JSONObject firstEvent = null;
-                    try {
+        String lingua = spref.getString("lingua", "");
+        RequestParams params = new RequestParams();
+        if(lingua.equals("Italiano")){
+            params.put("","it");
+        }else{
+            params.put("","de");
+        }
+
+        SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                // If the response is JSONObject instead of expected JSONArray
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                // Pull out the first event on the public timeline
+                JSONObject firstEvent = null;
+                try {
 
 
-                        for (int i = 0; i < timeline.length(); i++) {
-                            firstEvent = (JSONObject) timeline.get(i);
-                            Supplier data = new Gson().fromJson(firstEvent.toString(), Supplier.class);
-                            esercentiArrayList.add(data);
-                        }
-
-                        esercenteListAdapter.add(esercentiArrayList);
-                        esercenteListAdapter.notifyDataSetChanged();
-                        if(esercentiArrayList.size()==1){
-                            textViewNumeroRisultati.setText(esercentiArrayList.size()+" "+risultato);
-                        }else{
-                            textViewNumeroRisultati.setText(esercentiArrayList.size()+" "+risultati);
-                        }
-
-                        LocalStorage.setListOfEsercenti(esercentiArrayList);
-                     //   progressBarLista.setVisibility(View.GONE);
-                        swipeLayout.setRefreshing(false);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    for (int i = 0; i < timeline.length(); i++) {
+                        firstEvent = (JSONObject) timeline.get(i);
+                        Supplier data = new Gson().fromJson(firstEvent.toString(), Supplier.class);
+                        esercentiArrayList.add(data);
                     }
 
+                    LocalStorage.setListOfEsercenti(esercentiArrayList);
+
+
+                    FilterHelper.filtraTotale(activity);
+
+                    esercenteListAdapter.add(LocalStorage.getListOfEsercentiFiltrata());
+                    esercenteListAdapter.notifyDataSetChanged();
+
+
+                    //   progressBarLista.setVisibility(View.GONE);
+                    swipeLayout.setRefreshing(false);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            });
+
+            }
+        });
 
     }
 }

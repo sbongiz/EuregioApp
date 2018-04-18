@@ -422,7 +422,7 @@ public class BottomSheet3DialogFragment extends android.support.design.widget.Bo
         }
 
         if (LocalStorage.getFiltriComprensorio().size() == 0) {
-            filtroSelezionatoComprensorio.setText(getString(R.string.tutte));
+            filtroSelezionatoComprensorio.setText(getString(R.string.tutti));
         } else {
             setTitleComprensorio();
             filtroSelezionatoComprensorio.setText(titleFiltroComprensorio);

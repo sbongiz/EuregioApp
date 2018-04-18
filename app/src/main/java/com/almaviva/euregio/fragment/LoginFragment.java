@@ -6,9 +6,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -51,6 +54,7 @@ public class LoginFragment extends Fragment {
     private boolean isIsfocusedCodf = false;
     private SharedPreferences spref;
     private RequestParams loginParams;
+    private static Context context;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -68,7 +72,7 @@ public class LoginFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-
+        context = getContext();
         findComponentInView(view);
 
 
@@ -192,14 +196,15 @@ public class LoginFragment extends Fragment {
                     editor.putString("card_retro_path", fileNuovo.getAbsolutePath());
                     editor.commit();
 
+                    MainActivity main = (MainActivity) getActivity();
+                    main.bottomNavigation.setSelectedItemId(R.id.navigation_euregio);
                 } catch (IOException e) {
 
                 }
             }
         });
 
-        MainActivity main = (MainActivity) getActivity();
-        main.viewPager.setCurrentItem(4);
+
     }
 
 
@@ -209,9 +214,27 @@ public class LoginFragment extends Fragment {
         editCodFisc = view.findViewById(R.id.edit_codf);
         editNumCarta = view.findViewById(R.id.edit_cardnumber);
         buttonAvanti = view.findViewById(R.id.button_login);
+        final View thisView = view;
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int heightDiff = thisView.getRootView().getHeight() - thisView.getHeight();
+                if (heightDiff > dpToPx(200)) { // if more than 200 dp, it's probably a keyboard...
 
+                    logo.setVisibility(View.GONE);
+                }else{
+                    logo.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
+    public static float dpToPx(float valueInDp) {
+
+
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -242,6 +265,9 @@ public class LoginFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+
+
 
 
 }

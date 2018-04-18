@@ -21,6 +21,7 @@ import com.almaviva.euregio.fragment.LoginFragment;
 import com.almaviva.euregio.fragment.MapFragment;
 import com.almaviva.euregio.fragment.SettingsFragment;
 import com.almaviva.euregio.fragment.VantaggiFragment;
+import com.almaviva.euregio.helper.FilterHelper;
 import com.almaviva.euregio.helper.LocalStorage;
 import com.almaviva.euregio.mock.CategoryRestClient;
 import com.almaviva.euregio.mock.DistrictRestClient;
@@ -31,6 +32,7 @@ import com.almaviva.euregio.model.Supplier;
 import com.almaviva.euregio.pager.NoSwipePager;
 import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         LoginFragment.OnFragmentInteractionListener {
 
 
-    private BottomNavigationView bottomNavigation;
+    public static BottomNavigationView bottomNavigation;
     public static NoSwipePager viewPager;
     private BottomBarAdapter pagerAdapter;
     private ListaFragment listaFragment;
@@ -77,12 +79,9 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
             setComponent();
 
             //FILTRI
-            setLanguage();
-            setPaginaHome();
-            setOrdinamentoEsercenti();
+            FilterHelper.aggiornaFiltriImpostati(this,false);
+
             setComprensori();
-
-
 
 
             setCategory();
@@ -90,23 +89,10 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
             cardFronteRetro();
 
             viewPager.setPagingEnabled(false);
-            pagerAdapter.addFragments(listaFragment);
-            pagerAdapter.addFragments(mapFragment);
-            pagerAdapter.addFragments(euregioFragment);
-            pagerAdapter.addFragments(impostazioniFragment);
-            pagerAdapter.addFragments(loginFragment);
 
 
-            viewPager.setAdapter(pagerAdapter);
 
 
-            if (paginaHome.equals(getString(R.string.esercenti))) {
-                bottomNavigation.setSelectedItemId(R.id.navigation_vantaggi);
-                viewPager.setCurrentItem(0);
-            } else if (paginaHome.equals(getString(R.string.title_mappa))) {
-                bottomNavigation.setSelectedItemId(R.id.navigation_mappa);
-                viewPager.setCurrentItem(1);
-            }
 
             bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -122,7 +108,8 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
                         viewPager.setCurrentItem(1);
                     }
                     if (id == R.id.navigation_euregio) {
-                        if (spref.getBoolean("isLogged",false)) {
+                        boolean isLogged= spref.getBoolean("isLogged",false);
+                        if (isLogged) {
                             viewPager.setCurrentItem(2);
 
                         } else {
@@ -143,89 +130,19 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         }
     }
 
-    private void setLanguage() {
-        String lingua = spref.getString("lingua", "");
 
-        if (lingua == "") {
-            //Al primo avvio controllo la lingua di sistema
-
-            String linguaSistema = Locale.getDefault().getDisplayLanguage().toString();
-
-            if (linguaSistema.equals("Deutsch")) {
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putString("lingua", "Deutsch");
-                editor.commit();
-            } else {
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putString("lingua", "Italiano");
-                editor.commit();
-            }
-
-        } else {
-            //Se non è il primo avvio controllo la preferenza della lingua
-
-            if (lingua.equals("Deutsch")) {
-                //IMPOSTA TEDESCO
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putString("lingua", "Deutsch");
-                editor.commit();
-            } else {
-                //IMPOSTA ITALIANO
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putString("lingua", "Italiano");
-                editor.commit();
-            }
-        }
-    }
-
-    private void setPaginaHome() {
-        String pagina_home = spref.getString("pagina_home", "");
-
-        if (pagina_home.equals("")) {
-            SharedPreferences.Editor editor = spref.edit();
-            editor.putString("pagina_home", getString(R.string.esercenti));
-            editor.commit();
-            paginaHome = getString(R.string.esercenti);
-        } else {
-
-            if (pagina_home.equals(getString(R.string.esercenti))) {
-                paginaHome = getString(R.string.esercenti);
-            } else {
-                paginaHome = getString(R.string.title_mappa);
-            }
-
-        }
-
-    }
-
-    private void setOrdinamentoEsercenti() {
-        String ordinamentoEsercenti = spref.getString("ordinamento_esercenti", "");
-
-        if (ordinamentoEsercenti.equals("")) {
-            SharedPreferences.Editor editor = spref.edit();
-            editor.putString("ordinamento_esercenti", getString(R.string.lista_data));
-            editor.commit();
-            LocalStorage.setFiltroOrdine(getString(R.string.data_aggiornamento));
-        } else {
-
-            if (ordinamentoEsercenti.equals(getString(R.string.lista_data))) {
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putString("ordinamento_esercenti", getString(R.string.lista_data));
-                editor.commit();
-                LocalStorage.setFiltroOrdine(getString(R.string.data_aggiornamento));
-            } else {
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putString("ordinamento_esercenti", getString(R.string.lista_alfabetica));
-                editor.commit();
-                LocalStorage.setFiltroOrdine(getString(R.string.alfabetico));
-            }
-
-        }
-    }
 
     private void setComprensori() {
 
         final ArrayList<District> comprensori = new ArrayList<District>();
+
+        String lingua = spref.getString("lingua", "");
+        RequestParams params = new RequestParams();
+        if(lingua.equals("Italiano")){
+            params.put("","it");
+        }else{
+            params.put("","de");
+        }
 
         DistrictRestClient.get("", null, new JsonHttpResponseHandler() {
             @Override
@@ -265,6 +182,26 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
                         LocalStorage.setIsSetComprensorio(false);
                     }
 
+                    pagerAdapter.addFragments(listaFragment);
+                    pagerAdapter.addFragments(mapFragment);
+                    pagerAdapter.addFragments(euregioFragment);
+                    pagerAdapter.addFragments(impostazioniFragment);
+                    pagerAdapter.addFragments(loginFragment);
+
+
+                    viewPager.setAdapter(pagerAdapter);
+
+                    String pagina_home = spref.getString("pagina_home", "");
+
+                    if (pagina_home.equals(getString(R.string.esercenti)) || pagina_home.equals("")) {
+                        bottomNavigation.setSelectedItemId(R.id.navigation_vantaggi);
+                        viewPager.setCurrentItem(0);
+                    } else if (pagina_home.equals(getString(R.string.title_mappa))) {
+                        bottomNavigation.setSelectedItemId(R.id.navigation_mappa);
+                        viewPager.setCurrentItem(1);
+                    }
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -282,6 +219,16 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
     private void setCategory(){
 
         final ArrayList<Category> categories = new ArrayList<Category>();
+
+
+        String lingua = spref.getString("lingua", "");
+        RequestParams params = new RequestParams();
+        if(lingua.equals("Italiano")){
+            params.put("","it");
+        }else{
+            params.put("","de");
+        }
+
 
         CategoryRestClient.get("", null, new JsonHttpResponseHandler() {
             @Override
@@ -304,6 +251,8 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
                     LocalStorage.setListOfCategories(categories);
 
                     ArrayList<Integer> arrayCompId = new ArrayList<Integer>();
+
+
 
 
                 } catch (JSONException e) {

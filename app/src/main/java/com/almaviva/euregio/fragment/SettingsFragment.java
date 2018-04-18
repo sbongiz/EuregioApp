@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.almaviva.euregio.R;
+import com.almaviva.euregio.helper.FilterHelper;
 import com.almaviva.euregio.helper.LocalStorage;
 import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
@@ -89,9 +90,9 @@ public class SettingsFragment extends PreferenceFragment {
 
     }
 
-    private void createComponentVisualizzazione(PreferenceCategory categoriaFiltri){
+    private void createComponentVisualizzazione(PreferenceCategory categoriaFiltri) {
 
-        String ordinamentoEsercenti = spref.getString("ordinamento_esercenti","");
+        String ordinamentoEsercenti = spref.getString("ordinamento_esercenti", "");
 
 
         final ListPreference listaVisualizzazione = new ListPreference(getActivity());
@@ -116,7 +117,7 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 listaVisualizzazione.setValue(newValue.toString());
                 listaVisualizzazione.setSummary(newValue.toString());
-                spref.edit().putString("ordinamento_esercenti",newValue.toString());
+                spref.edit().putString("ordinamento_esercenti", newValue.toString());
                 spref.edit().commit();
                 return false;
             }
@@ -126,9 +127,9 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     private void createComponentMascheraIniziale(PreferenceCategory categoriaFiltri) {
-        String paginaHome = spref.getString("pagina_home","");
+        String paginaHome = spref.getString("pagina_home", "");
 
-       final ListPreference listaMaschere = new ListPreference(getActivity());
+        final ListPreference listaMaschere = new ListPreference(getActivity());
 
         String[] charSequenceLingua = new String[2];
 
@@ -150,7 +151,7 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 listaMaschere.setValue(newValue.toString());
                 listaMaschere.setSummary(newValue.toString());
-                spref.edit().putString("pagina_home",newValue.toString());
+                spref.edit().putString("pagina_home", newValue.toString());
                 spref.edit().commit();
                 return false;
             }
@@ -172,7 +173,7 @@ public class SettingsFragment extends PreferenceFragment {
     private void createComponentLingua(final PreferenceCategory categoriaLingua) {
 
 
-        String lingua = spref.getString("lingua","");
+        String lingua = spref.getString("lingua", "");
 
         final ListPreference listaLingue = new ListPreference(getActivity());
 
@@ -193,7 +194,7 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 listaLingue.setValue(newValue.toString());
                 listaLingue.setSummary(newValue.toString());
-                spref.edit().putString("lingua",newValue.toString());
+                spref.edit().putString("lingua", newValue.toString());
                 spref.edit().commit();
 
                 return false;
@@ -210,20 +211,19 @@ public class SettingsFragment extends PreferenceFragment {
         screenCategory.setTitle(getString(R.string.comprensorio));
 
 
-
         for (District dis : LocalStorage.getListOfComprensori()) {
             CheckBoxPreference checkBoxPref = new CheckBoxPreference(getActivity());
-            checkBoxPref.setKey("check"+dis.id);
+            checkBoxPref.setKey("check" + dis.id);
             checkBoxPref.setSummary(dis.name);
             checkBoxPref.setChecked(false);
             screenCategory.addPreference(checkBoxPref);
         }
 
 
-
         categoriaFiltri.addPreference(screenCategory);
 
     }
+
 
 
 }

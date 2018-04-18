@@ -20,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.almaviva.euregio.R;
+import com.almaviva.euregio.helper.FilterHelper;
 import com.almaviva.euregio.helper.LocalStorage;
 import com.almaviva.euregio.model.Category;
 
@@ -44,6 +45,7 @@ public class ImpostazioniFragment extends Fragment {
     private TextView filtroSelezionato;
     private CharSequence titleFiltroCategorie = "";
     private static View view;
+    private boolean isFragmentShowing=false;
     public ImpostazioniFragment() {
         // Required empty public constructor
     }
@@ -67,7 +69,6 @@ public class ImpostazioniFragment extends Fragment {
         }
         try{
             view = inflater.inflate(R.layout.fragment_impostazioni, container, false);
-            findComponentInView(view);
         }catch (InflateException e){
 
         }
@@ -79,138 +80,6 @@ public class ImpostazioniFragment extends Fragment {
     }
 
 
-    private void findComponentInView(View view) {
-
-
-        iconaExpand = view.findViewById(R.id.icona_expand);
-        categoryRadioGroup = (RadioGroup) view.findViewById(R.id.radioGroup_category);
-        filtroSelezionato = (TextView) view.findViewById(R.id.textView_filtro_selezionato);
-        scrollViewCategorie = (LinearLayout) view.findViewById(R.id.scrollViewCategorie);
-
-    }
-
-    private void animateRadioGroup() {
-        if (isCategoryListShown) {
-
-            slideUp(getContext(), scrollViewCategorie);
-            rotateFrecciaDown(getContext(), iconaExpand);
-            categoryRadioGroup.setBackgroundColor(getResources().getColor(R.color.white));
-            scrollViewCategorie.setVisibility(View.GONE);
-            categoryRadioGroup.setVisibility(View.GONE);
-            isCategoryListShown = false;
-        }else {
-            categoryRadioGroup.setBackgroundColor(getResources().getColor(R.color.light_grey));
-            slideDown(getContext(), scrollViewCategorie);
-            rotateFrecciaUp(getContext(), iconaExpand);
-            scrollViewCategorie.setVisibility(View.VISIBLE);
-            categoryRadioGroup.setVisibility(View.VISIBLE);
-            isCategoryListShown = true;
-        }
-    }
-
-    private void getCategory() throws ParseException {
-
-
-        categoryList = LocalStorage.getListOfCategories();
-
-        for (Category cat : categoryList) {
-            CheckBox cb = new CheckBox(getContext());
-            cb.setText(cat.name);
-            cb.setId(cat.id);
-            cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                    if (filtriSelezionatiCategoriaId == null) {
-                        filtriSelezionatiCategoriaId = new ArrayList<Integer>();
-                    }
-                    if (!filtriSelezionatiCategoriaId.contains(buttonView.getId()) &&isChecked) {
-                        filtriSelezionatiCategoriaId.add(buttonView.getId());
-                    }else if(filtriSelezionatiCategoriaId.contains(buttonView.getId()) && !isChecked){
-                        filtriSelezionatiCategoriaId.remove( filtriSelezionatiCategoriaId.indexOf(buttonView.getId()));
-                    }
-
-                    setTitleCategorie();
-                    filtroSelezionato.setText(titleFiltroCategorie);
-
-
-                }
-            });
-            categoryRadioGroup.addView(cb);
-
-        }
-
-
-    }
-
-    private void setTitleCategorie() {
-        titleFiltroCategorie = "";
-        for (Integer i : filtriSelezionatiCategoriaId) {
-
-            CheckBox selectedRadioButton = (CheckBox) categoryRadioGroup.findViewById(i);
-
-            if (titleFiltroCategorie == "") {
-                titleFiltroCategorie = selectedRadioButton.getText();
-            } else {
-                titleFiltroCategorie = titleFiltroCategorie.toString() + ", " + selectedRadioButton.getText();
-            }
-
-            selectedRadioButton.setChecked(true);
-        }
-        if (titleFiltroCategorie == "") {
-            titleFiltroCategorie = getString(R.string.tutte);
-
-
-        }
-    }
-
-    private void setSpinnerLingua() {
-        List<String> spinnerArray = new ArrayList<String>();
-        spinnerArray.add("Italiano");
-        spinnerArray.add("Deutsche");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getActivity(), android.R.layout.simple_spinner_item, spinnerArray);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerLingua.setAdapter(adapter);
-    }
-
-    private void setSpinnerHomepage() {
-        List<String> spinnerArray = new ArrayList<String>();
-        spinnerArray.add(getString(R.string.pagina_esercenti));
-        spinnerArray.add(getString(R.string.pagina_euregio));
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getActivity(), android.R.layout.simple_spinner_item, spinnerArray);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerHomepage.setAdapter(adapter);
-    }
-
-    private void setSpinnerFiltriEsercente() {
-        List<String> spinnerArray = new ArrayList<String>();
-        spinnerArray.add(getString(R.string.title_mappa));
-        spinnerArray.add(getString(R.string.lista_alfabetica));
-        spinnerArray.add(getString(R.string.lista_data));
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getActivity(), android.R.layout.simple_spinner_item, spinnerArray);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerFiltriEsercente.setAdapter(adapter);
-    }
-
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -234,55 +103,18 @@ public class ImpostazioniFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
 
-
-    //region Animazioni
-    private static void slideDown(Context ctx, View v) {
-        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_down);
-
-        if (a != null) {
-            a.reset();
-            if (v != null) {
-                v.clearAnimation();
-                v.startAnimation(a);
+        if (isVisibleToUser) {
+            isFragmentShowing = true;
+        } else {
+            if (isFragmentShowing) {
+                FilterHelper.aggiornaFiltriImpostati(getActivity(),true);
             }
+            isFragmentShowing = false;
         }
     }
 
-    private static void slideUp(Context ctx, View v) {
-        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_up);
-
-        if (a != null) {
-            a.reset();
-            if (v != null) {
-                v.clearAnimation();
-                v.startAnimation(a);
-            }
-        }
-    }
-
-    private static void rotateFrecciaUp(Context ctx, View v) {
-        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.rotate_up);
-        a.setFillAfter(true);
-        if (a != null) {
-            a.reset();
-            if (v != null) {
-                v.clearAnimation();
-                v.startAnimation(a);
-            }
-        }
-    }
-
-    private static void rotateFrecciaDown(Context ctx, View v) {
-        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.rotate_down);
-        a.setFillAfter(true);
-        if (a != null) {
-            a.reset();
-            if (v != null) {
-                v.clearAnimation();
-                v.startAnimation(a);
-            }
-        }
-    }
-    //endregion
 }

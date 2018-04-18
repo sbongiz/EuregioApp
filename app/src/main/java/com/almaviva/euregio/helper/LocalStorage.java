@@ -5,6 +5,7 @@ import android.content.Context;
 import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
 import com.almaviva.euregio.model.Supplier;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -34,6 +35,8 @@ public  class LocalStorage {
     public static String testoCercato;
     public static String testoCercatoMappa;
     public static boolean isLogged=false;
+
+    public static LatLng myLastKnownLocation = null;
 
 
     public static void setFiltriCategoriaMappa(ArrayList<Integer> filtriCategoriaMappaNew){
@@ -186,6 +189,14 @@ public  class LocalStorage {
 
     public static ArrayList<Category> getListOfCategories(){
         return  listOfCategories;
+    }
+
+    public static void setMyLastKnownLocation(LatLng myLocationNew){
+        myLastKnownLocation = myLocationNew;
+    }
+
+    public static LatLng getMyLastKnownLocation(){
+        return  myLastKnownLocation;
     }
 
 }
