@@ -25,6 +25,11 @@ public  class LocalStorage {
     public static ArrayList<Supplier> listOfEsercenti = new ArrayList<Supplier>() ;
     public static ArrayList<Supplier> listOfEsercentiFiltrata = new ArrayList<Supplier>();
     public static ArrayList<Supplier> listOfEsercentiFiltrataMappa = new ArrayList<Supplier>();
+
+    public static ArrayList<District> listOfDistricts = new ArrayList<District>();
+
+    public static ArrayList<Category> listOfCategories= new ArrayList<Category>();
+
     public static boolean isDecrescente=false;
     public static String testoCercato;
     public static String testoCercatoMappa;
@@ -166,5 +171,21 @@ public  class LocalStorage {
         return  isLogged;
     }
 
+
+    public static void setListOfComprensori(ArrayList<District> listOfComprensoriNew){
+        listOfDistricts = listOfComprensoriNew;
+    }
+
+    public static ArrayList<District> getListOfComprensori(){
+        return  listOfDistricts;
+    }
+
+    public static void setListOfCategories(ArrayList<Category> listOfCategoriesNew){
+        listOfCategories = listOfCategoriesNew;
+    }
+
+    public static ArrayList<Category> getListOfCategories(){
+        return  listOfCategories;
+    }
 
 }

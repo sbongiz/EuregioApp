@@ -20,8 +20,11 @@ import com.almaviva.euregio.model.Esercente;
 import com.almaviva.euregio.model.Supplier;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 
 /**
@@ -77,8 +80,22 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         }
 
 
+        String data= listOfEsercenti.get(position).getDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        Date convertedDate = new Date();
+        try {
+            convertedDate = sdf.parse(data);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        int var  =convertedDate.getMonth()+1;
+
+        String b = String.valueOf(var);
+
         holder.title.setText(listOfEsercenti.get(position).getTitle());
-        holder.data.setText(listOfEsercenti.get(position).getDate());
+        holder.data.setText(convertedDate.getDate()+"/"+b );
         holder.indirizzo.setText(listOfEsercenti.get(position).getIndirizzo());
 
 

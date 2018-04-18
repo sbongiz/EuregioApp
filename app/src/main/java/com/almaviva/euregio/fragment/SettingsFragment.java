@@ -20,8 +20,6 @@ import android.view.ViewGroup;
 
 import com.almaviva.euregio.R;
 import com.almaviva.euregio.helper.LocalStorage;
-import com.almaviva.euregio.mock.CategoryMock;
-import com.almaviva.euregio.mock.DistrictMock;
 import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
 
@@ -213,7 +211,7 @@ public class SettingsFragment extends PreferenceFragment {
 
 
 
-        for (District dis : DistrictMock.getListMock()) {
+        for (District dis : LocalStorage.getListOfComprensori()) {
             CheckBoxPreference checkBoxPref = new CheckBoxPreference(getActivity());
             checkBoxPref.setKey("check"+dis.id);
             checkBoxPref.setSummary(dis.name);

@@ -20,8 +20,6 @@ import com.almaviva.euregio.MainActivity;
 import com.almaviva.euregio.R;
 import com.almaviva.euregio.fragment.ListaFragment;
 import com.almaviva.euregio.fragment.MapFragment;
-import com.almaviva.euregio.mock.CategoryMock;
-import com.almaviva.euregio.mock.DistrictMock;
 import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
 
@@ -173,7 +171,7 @@ public class BottomSheet2DialogFragment extends android.support.design.widget.Bo
     private void getCategory() throws ParseException {
 
 
-        categoryList = CategoryMock.getListMock();
+        categoryList = LocalStorage.getListOfCategories();
 
         for (Category cat : categoryList) {
             CheckBox cb = new CheckBox(getContext());

@@ -2,8 +2,13 @@ package com.almaviva.euregio.fragment;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,6 +21,8 @@ import android.widget.ImageView;
 
 import com.almaviva.euregio.R;
 
+import java.io.File;
+
 
 public class EuregioFragment extends Fragment implements Animation.AnimationListener {
 
@@ -25,6 +32,10 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
     private Animation toMiddle;
     private Animation fromMiddle;
     private boolean isBackOfCardShowing;
+    private File fileFronte;
+    private File fileRetro;
+    private SharedPreferences spref;
+
     public EuregioFragment() {
         // Required empty public constructor
     }
@@ -41,32 +52,84 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
         // Inflate the layout for this fragment
 
         View view;
-        boolean isLogged = true;
-        if (isLogged) {
-            view =  inflater.inflate(R.layout.fragment_euregio, container, false);
-        } else {
-            view = inflater.inflate(R.layout.fragment_login, container, false);
-        }
+
+
+        view = inflater.inflate(R.layout.fragment_euregio, container, false);
+
 
         try {
-            image = (ImageView) view.findViewById(R.id.card_image);
-            toMiddle = AnimationUtils.loadAnimation(getActivity(),R.anim.to_middle);
-            fromMiddle = AnimationUtils.loadAnimation(getActivity(),R.anim.from_middle);
-            toMiddle.setAnimationListener(this);
-            fromMiddle.setAnimationListener(this);
-            image.setRotation(-90);
-            FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //image.setImageResource(R.drawable.card_retro);
-                    flipIt(image);
-                }
-            });
-        }catch(Exception e){
+
+            findComponentInView(view);
+
+
+            spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+            String pathFronte = spref.getString("card_fronte_path", "");
+            String pathRetro = spref.getString("card_retro_path", "");
+
+            if (pathFronte != "") {
+                fileFronte = new File(pathFronte);
+            }
+
+            if (pathRetro != "") {
+                fileRetro = new File(pathRetro);
+            }
+
+            String fronteRetro = spref.getString("fronte_retro", "");
+
+            if(fronteRetro.equals("front")){
+                Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
+                image.setImageBitmap(myBitmap);
+            }else{
+                Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
+                image.setImageBitmap(myBitmap);
+            }
+
+
+
+
+
+        } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
         return view;
+    }
+
+
+    private void findComponentInView(View view) {
+        image = (ImageView) view.findViewById(R.id.card_image);
+        toMiddle = AnimationUtils.loadAnimation(getActivity(), R.anim.to_middle);
+        fromMiddle = AnimationUtils.loadAnimation(getActivity(), R.anim.from_middle);
+        toMiddle.setAnimationListener(this);
+        fromMiddle.setAnimationListener(this);
+
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //image.setImageResource(R.drawable.card_retro);
+                flipIt(image);
+            }
+        });
+
+        FloatingActionButton fabLogout = (FloatingActionButton) view.findViewById(R.id.fabLogout);
+        fabLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SharedPreferences.Editor editor = spref.edit();
+                editor.putBoolean("isLogged", false);
+                editor.commit();
+
+
+                editor.putString("card_fronte_path", "");
+                editor.commit();
+                editor.putString("card_retro_path", "");
+                editor.commit();
+
+            }
+        });
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -100,18 +163,20 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
 
     @Override
     public void onAnimationEnd(Animation animation) {
-        if (animation==toMiddle) {
+        if (animation == toMiddle) {
 
             image.clearAnimation();
             image.setAnimation(fromMiddle);
             image.startAnimation(fromMiddle);
             if (isBackOfCardShowing) {
-                image.setImageResource(R.drawable.card_fronte);
+                Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
+                image.setImageBitmap(myBitmap);
             } else {
-                image.setImageResource(R.drawable.card_retro);
+                Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
+                image.setImageBitmap(myBitmap);
             }
         } else {
-            isBackOfCardShowing=!isBackOfCardShowing;
+            isBackOfCardShowing = !isBackOfCardShowing;
         }
     }
 

@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -36,21 +39,34 @@ import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.almaviva.euregio.MainActivity;
 import com.almaviva.euregio.R;
 import com.almaviva.euregio.adapter.EsercenteListAdapter;
 import com.almaviva.euregio.behavior.AnchorBottomSheetBehavior;
 import com.almaviva.euregio.helper.BottomSheet3DialogFragment;
 import com.almaviva.euregio.helper.FilterHelper;
 import com.almaviva.euregio.helper.LocalStorage;
-import com.almaviva.euregio.mock.SupplierMock;
+import com.almaviva.euregio.mock.SupplierRestClient;
 import com.almaviva.euregio.model.OrdineFiltro;
 import com.almaviva.euregio.model.Supplier;
+import com.google.gson.Gson;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+
+import cz.msebera.android.httpclient.Header;
 
 
 public class ListaFragment extends Fragment {
@@ -64,7 +80,7 @@ public class ListaFragment extends Fragment {
     private ImageView iconOrdine;
     private TextView TextViewFiltroOrdine;
     public static EsercenteListAdapter esercenteListAdapter;
-    private ArrayList<Supplier> esercentiArrayList;
+    public static ArrayList<Supplier> esercentiArrayList;
     private Toolbar toolbar;
     private SearchManager searchManager;
     private SearchView searchView;
@@ -76,6 +92,10 @@ public class ListaFragment extends Fragment {
     public boolean isSearchWhite = false;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
     private SharedPreferences spref;
+    //public static ProgressBar progressBarLista;
+    public static String risultati;
+    public static String risultato;
+    public static SwipeRefreshLayout swipeLayout;
 
 
     public ListaFragment() {
@@ -89,8 +109,6 @@ public class ListaFragment extends Fragment {
     }
 
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -101,8 +119,8 @@ public class ListaFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_lista, container, false);
         try {
             setHasOptionsMenu(true);
-
-
+            risultati = getString(R.string.risultati);
+            risultato= getString(R.string.risultato);
             findComponentInView(view);
             setComponent();
             getEsercenti();
@@ -110,8 +128,6 @@ public class ListaFragment extends Fragment {
             setFiltriDaImpostazioni();
 
             FilterHelper.filtraTotale(getActivity());
-
-
 
 
             //LISTENER
@@ -253,7 +269,7 @@ public class ListaFragment extends Fragment {
             esercentiArrayList = new ArrayList<Supplier>();
 
             if (LocalStorage.getListOfEsercentiFiltrata().size() == 0) {
-                esercentiArrayList = SupplierMock.getListaSupplier();
+                retriveFilterAsyncTask();
                 LocalStorage.setListOfEsercenti(esercentiArrayList);
             } else {
                 esercentiArrayList = LocalStorage.getListOfEsercentiFiltrata();
@@ -275,6 +291,16 @@ public class ListaFragment extends Fragment {
         esercentiList.setDivider(null);
         esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Supplier>());
         esercentiList.setAdapter(esercenteListAdapter);
+
+
+
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                        retriveFilterAsyncTask();
+            }
+        });
+
     }
 
     private void findComponentInView(View view) {
@@ -283,6 +309,8 @@ public class ListaFragment extends Fragment {
         textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
         iconOrdine = (ImageView) view.findViewById(R.id.iconFilterAlfabetico);
         textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
+        //progressBarLista = (ProgressBar) view.findViewById(R.id.progressBarLista);
+        swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeLayout);
     }
 
     private void setMenuComponent(Menu menu) {
@@ -385,6 +413,7 @@ public class ListaFragment extends Fragment {
 
 
 
+
     private void changeSearchToNormalMode() {
         Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
 
@@ -474,5 +503,50 @@ public class ListaFragment extends Fragment {
             }
             isFragmentShowing = false;
         }
+    }
+
+
+    public static void  retriveFilterAsyncTask (){
+
+       // progressBarLista.setVisibility(View.VISIBLE);
+        esercentiArrayList = new ArrayList<Supplier>();
+            SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    // If the response is JSONObject instead of expected JSONArray
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                    // Pull out the first event on the public timeline
+                    JSONObject firstEvent = null;
+                    try {
+
+
+                        for (int i = 0; i < timeline.length(); i++) {
+                            firstEvent = (JSONObject) timeline.get(i);
+                            Supplier data = new Gson().fromJson(firstEvent.toString(), Supplier.class);
+                            esercentiArrayList.add(data);
+                        }
+
+                        esercenteListAdapter.add(esercentiArrayList);
+                        esercenteListAdapter.notifyDataSetChanged();
+                        if(esercentiArrayList.size()==1){
+                            textViewNumeroRisultati.setText(esercentiArrayList.size()+" "+risultato);
+                        }else{
+                            textViewNumeroRisultati.setText(esercentiArrayList.size()+" "+risultati);
+                        }
+
+                        LocalStorage.setListOfEsercenti(esercentiArrayList);
+                     //   progressBarLista.setVisibility(View.GONE);
+                        swipeLayout.setRefreshing(false);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+
     }
 }

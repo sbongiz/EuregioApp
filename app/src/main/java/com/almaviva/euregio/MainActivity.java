@@ -22,25 +22,38 @@ import com.almaviva.euregio.fragment.MapFragment;
 import com.almaviva.euregio.fragment.SettingsFragment;
 import com.almaviva.euregio.fragment.VantaggiFragment;
 import com.almaviva.euregio.helper.LocalStorage;
-import com.almaviva.euregio.mock.DistrictMock;
+import com.almaviva.euregio.mock.CategoryRestClient;
+import com.almaviva.euregio.mock.DistrictRestClient;
+import com.almaviva.euregio.mock.SupplierRestClient;
+import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
+import com.almaviva.euregio.model.Supplier;
 import com.almaviva.euregio.pager.NoSwipePager;
+import com.google.gson.Gson;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity implements VantaggiFragment.OnFragmentInteractionListener,
         EuregioFragment.OnFragmentInteractionListener,
         ImpostazioniFragment.OnFragmentInteractionListener,
         ListaFragment.OnFragmentInteractionListener,
         MapFragment.OnFragmentInteractionListener,
-        LoginFragment.OnFragmentInteractionListener{
+        LoginFragment.OnFragmentInteractionListener {
 
 
     private BottomNavigationView bottomNavigation;
-    private NoSwipePager viewPager;
+    public static NoSwipePager viewPager;
     private BottomBarAdapter pagerAdapter;
     private ListaFragment listaFragment;
     private EuregioFragment euregioFragment;
@@ -59,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         try {
 
 
-             spref = PreferenceManager.getDefaultSharedPreferences(this);
+            spref = PreferenceManager.getDefaultSharedPreferences(this);
 
             setComponent();
 
@@ -69,10 +82,12 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
             setOrdinamentoEsercenti();
             setComprensori();
 
+
+
+
+            setCategory();
             checkIfLogged();
-
-
-
+            cardFronteRetro();
 
             viewPager.setPagingEnabled(false);
             pagerAdapter.addFragments(listaFragment);
@@ -85,11 +100,10 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
             viewPager.setAdapter(pagerAdapter);
 
 
-
-            if(paginaHome.equals(getString(R.string.esercenti))){
+            if (paginaHome.equals(getString(R.string.esercenti))) {
                 bottomNavigation.setSelectedItemId(R.id.navigation_vantaggi);
                 viewPager.setCurrentItem(0);
-            }else if(paginaHome.equals(getString(R.string.title_mappa))){
+            } else if (paginaHome.equals(getString(R.string.title_mappa))) {
                 bottomNavigation.setSelectedItemId(R.id.navigation_mappa);
                 viewPager.setCurrentItem(1);
             }
@@ -108,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
                         viewPager.setCurrentItem(1);
                     }
                     if (id == R.id.navigation_euregio) {
-                        if (LocalStorage.getIsLogged()) {
+                        if (spref.getBoolean("isLogged",false)) {
                             viewPager.setCurrentItem(2);
 
                         } else {
@@ -129,54 +143,54 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         }
     }
 
-    private void setLanguage(){
-        String lingua = spref.getString("lingua","");
+    private void setLanguage() {
+        String lingua = spref.getString("lingua", "");
 
-        if(lingua==""){
+        if (lingua == "") {
             //Al primo avvio controllo la lingua di sistema
 
             String linguaSistema = Locale.getDefault().getDisplayLanguage().toString();
 
-            if(linguaSistema.equals("Deutsch")){
-                SharedPreferences.Editor  editor = spref.edit();
-                editor.putString("lingua","Deutsch");
+            if (linguaSistema.equals("Deutsch")) {
+                SharedPreferences.Editor editor = spref.edit();
+                editor.putString("lingua", "Deutsch");
                 editor.commit();
-            }else{
-                SharedPreferences.Editor  editor = spref.edit();
-                editor.putString("lingua","Italiano");
+            } else {
+                SharedPreferences.Editor editor = spref.edit();
+                editor.putString("lingua", "Italiano");
                 editor.commit();
             }
 
-        }else{
+        } else {
             //Se non è il primo avvio controllo la preferenza della lingua
 
-            if(lingua.equals("Deutsch")){
+            if (lingua.equals("Deutsch")) {
                 //IMPOSTA TEDESCO
-                SharedPreferences.Editor  editor = spref.edit();
-                editor.putString("lingua","Deutsch");
+                SharedPreferences.Editor editor = spref.edit();
+                editor.putString("lingua", "Deutsch");
                 editor.commit();
-            }else{
+            } else {
                 //IMPOSTA ITALIANO
-                SharedPreferences.Editor  editor = spref.edit();
-                editor.putString("lingua","Italiano");
+                SharedPreferences.Editor editor = spref.edit();
+                editor.putString("lingua", "Italiano");
                 editor.commit();
             }
         }
     }
 
-    private void setPaginaHome(){
-        String pagina_home = spref.getString("pagina_home","");
+    private void setPaginaHome() {
+        String pagina_home = spref.getString("pagina_home", "");
 
-        if(pagina_home.equals("")){
-            SharedPreferences.Editor  editor = spref.edit();
-            editor.putString("pagina_home",getString(R.string.esercenti));
+        if (pagina_home.equals("")) {
+            SharedPreferences.Editor editor = spref.edit();
+            editor.putString("pagina_home", getString(R.string.esercenti));
             editor.commit();
             paginaHome = getString(R.string.esercenti);
-        }else{
+        } else {
 
-            if(pagina_home.equals(getString(R.string.esercenti))){
+            if (pagina_home.equals(getString(R.string.esercenti))) {
                 paginaHome = getString(R.string.esercenti);
-            }else{
+            } else {
                 paginaHome = getString(R.string.title_mappa);
             }
 
@@ -184,24 +198,24 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
 
     }
 
-    private void setOrdinamentoEsercenti(){
-        String ordinamentoEsercenti = spref.getString("ordinamento_esercenti","");
+    private void setOrdinamentoEsercenti() {
+        String ordinamentoEsercenti = spref.getString("ordinamento_esercenti", "");
 
-        if(ordinamentoEsercenti.equals("")){
-            SharedPreferences.Editor  editor = spref.edit();
-            editor.putString("ordinamento_esercenti",getString(R.string.lista_data));
+        if (ordinamentoEsercenti.equals("")) {
+            SharedPreferences.Editor editor = spref.edit();
+            editor.putString("ordinamento_esercenti", getString(R.string.lista_data));
             editor.commit();
             LocalStorage.setFiltroOrdine(getString(R.string.data_aggiornamento));
-        }else{
+        } else {
 
-            if(ordinamentoEsercenti.equals(getString(R.string.lista_data))){
-                SharedPreferences.Editor  editor = spref.edit();
-                editor.putString("ordinamento_esercenti",getString(R.string.lista_data));
+            if (ordinamentoEsercenti.equals(getString(R.string.lista_data))) {
+                SharedPreferences.Editor editor = spref.edit();
+                editor.putString("ordinamento_esercenti", getString(R.string.lista_data));
                 editor.commit();
                 LocalStorage.setFiltroOrdine(getString(R.string.data_aggiornamento));
-            }else{
-                SharedPreferences.Editor  editor = spref.edit();
-                editor.putString("ordinamento_esercenti",getString(R.string.lista_alfabetica));
+            } else {
+                SharedPreferences.Editor editor = spref.edit();
+                editor.putString("ordinamento_esercenti", getString(R.string.lista_alfabetica));
                 editor.commit();
                 LocalStorage.setFiltroOrdine(getString(R.string.alfabetico));
             }
@@ -209,32 +223,128 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
         }
     }
 
-    private void setComprensori(){
+    private void setComprensori() {
 
+        final ArrayList<District> comprensori = new ArrayList<District>();
 
-        ArrayList<Integer> arrayCompId = new ArrayList<Integer>();
-        try {
-            for (District dis: DistrictMock.getListMock()) {
-
-                boolean checkPreference = spref.getBoolean("check"+dis.id,false);
-
-                if(checkPreference==true){
-                    arrayCompId.add(dis.id);
-                }
+        DistrictRestClient.get("", null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                // If the response is JSONObject instead of expected JSONArray
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
-        if(arrayCompId.size()>0){
-            LocalStorage.setFiltroComprensorio(arrayCompId);
-            LocalStorage.setIsSetComprensorio(true);
-        }
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                // Pull out the first event on the public timeline
+                JSONObject firstEvent = null;
+                try {
+
+                    for (int i = 0; i < timeline.length(); i++) {
+                        firstEvent = (JSONObject) timeline.get(i);
+                        District data = new Gson().fromJson(firstEvent.toString(), District.class);
+                        comprensori.add(data);
+                    }
+
+                    LocalStorage.setListOfComprensori(comprensori);
+
+                    ArrayList<Integer> arrayCompId = new ArrayList<Integer>();
+
+                    for (District dis : comprensori) {
+
+                        boolean checkPreference = spref.getBoolean("check" + dis.id, false);
+
+                        if (checkPreference == true) {
+                            arrayCompId.add(dis.id);
+                        }
+                    }
+
+                    LocalStorage.setFiltroComprensorio(arrayCompId);
+                    if (arrayCompId.size() > 0) {
+                        LocalStorage.setIsSetComprensorio(true);
+                    } else {
+                        LocalStorage.setIsSetComprensorio(false);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
+
 
 
     }
 
+
+    private void setCategory(){
+
+        final ArrayList<Category> categories = new ArrayList<Category>();
+
+        CategoryRestClient.get("", null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                // If the response is JSONObject instead of expected JSONArray
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                // Pull out the first event on the public timeline
+                JSONObject firstEvent = null;
+                try {
+
+                    for (int i = 0; i < timeline.length(); i++) {
+                        firstEvent = (JSONObject) timeline.get(i);
+                        Category data = new Gson().fromJson(firstEvent.toString(), Category.class);
+                        categories.add(data);
+                    }
+
+                    LocalStorage.setListOfCategories(categories);
+
+                    ArrayList<Integer> arrayCompId = new ArrayList<Integer>();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+
     private void checkIfLogged() {
+        boolean isLogged = spref.getBoolean("isLogged", false);
+
+
+
+
+        if(isLogged == false ){
+            SharedPreferences.Editor editor = spref.edit();
+            editor.putBoolean("isLogged",false);
+            editor.commit();
+        }
+    }
+
+    private void cardFronteRetro(){
+
+
+        String fronteRetro = spref.getString("fronte_retro", "");
+
+
+        if(fronteRetro.equals("")){
+            SharedPreferences.Editor editor = spref.edit();
+            editor.putString("fronte_retro", "front");
+            editor.commit();
+        }
+
+
+
+
+        String path = spref.getString("card_fronte_path","");
+
+        String s ="£";
 
     }
 
@@ -274,15 +384,15 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
 
     }
 
- //  @Override
- //  public void onWindowFocusChanged(boolean hasFocus) {
- //      super.onWindowFocusChanged(hasFocus);
- //      if (hasFocus) {
- //          getWindow().getDecorView().setSystemUiVisibility(
- //                  View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
- //                          | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
- //      }
- //  }
+    //  @Override
+    //  public void onWindowFocusChanged(boolean hasFocus) {
+    //      super.onWindowFocusChanged(hasFocus);
+    //      if (hasFocus) {
+    //          getWindow().getDecorView().setSystemUiVisibility(
+    //                  View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+    //                          | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    //      }
+    //  }
     //endregion
 
     //region LISTENER

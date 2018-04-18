@@ -20,6 +20,7 @@
     <string name="alfabetico">Alfabetico</string>
     <string name="data_aggiornamento">Data di Aggiornamento</string>
     <string name="risultati">Risultati</string>
+    <string name="risultato">Risultato</string>
     <string name="avanti">AVANTI</string>
     <string name="numero_carta">Numero Carta</string>
     <string name="codice_fiscale">Codice Fiscale</string>
@@ -37,4 +38,5 @@
     <string name="indicazioni">INDICAZIONI</string>
     <string name="push">Push Notification</string>
     <string name="esercenti">Esercenti</string>
+    <string name="errore_login">Attenzione! Login non andato a buon fine</string>
 </resources>

@@ -13,8 +13,6 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.internal.view.SupportMenuItem;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.accessibility.AccessibilityManagerCompat;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -31,20 +29,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.AutoCompleteTextView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.almaviva.euregio.MainActivity;
 import com.almaviva.euregio.R;
 
 import com.almaviva.euregio.behavior.AnchorBottomSheetBehavior;
 import com.almaviva.euregio.helper.BottomSheet2DialogFragment;
-import com.almaviva.euregio.helper.BottomSheet3DialogFragment;
 import com.almaviva.euregio.helper.LocalStorage;
-import com.almaviva.euregio.model.Product;
 import com.almaviva.euregio.model.Product;
 import com.almaviva.euregio.model.Supplier;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,12 +48,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Text;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -281,14 +269,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         for (Supplier sup : LocalStorage.getListOfEsercentiFiltrataMappa()) {
 
-            Double lat = Double.parseDouble(sup.location.lat);
-            Double lon = Double.parseDouble(sup.location.lon);
-            LatLng markerLatLng = new LatLng(lat, lon);
 
-            MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.location.description);
-            String id = Integer.toString(sup.id);
-            markerCorrente.snippet(id);
-            googleMap.addMarker(markerCorrente);
+            if(sup.location.lat!=null && sup.location.lon!=null){
+
+                Double lat = Double.parseDouble(sup.location.lat);
+                Double lon = Double.parseDouble(sup.location.lon);
+                LatLng markerLatLng = new LatLng(lat, lon);
+
+                MarkerOptions markerCorrente = new MarkerOptions().position(markerLatLng).title(sup.location.description);
+                String id = Integer.toString(sup.id);
+                markerCorrente.snippet(id);
+                googleMap.addMarker(markerCorrente);
+            }
+
         }
 
 

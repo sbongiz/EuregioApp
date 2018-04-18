@@ -21,7 +21,6 @@ import android.widget.TextView;
 
 import com.almaviva.euregio.R;
 import com.almaviva.euregio.helper.LocalStorage;
-import com.almaviva.euregio.mock.CategoryMock;
 import com.almaviva.euregio.model.Category;
 
 import java.text.ParseException;
@@ -112,7 +111,7 @@ public class ImpostazioniFragment extends Fragment {
     private void getCategory() throws ParseException {
 
 
-        categoryList = CategoryMock.getListMock();
+        categoryList = LocalStorage.getListOfCategories();
 
         for (Category cat : categoryList) {
             CheckBox cb = new CheckBox(getContext());
