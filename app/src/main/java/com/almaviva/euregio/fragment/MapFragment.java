@@ -34,6 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
@@ -127,7 +128,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public static MapFragment contextMap;
     public static String immagineEsercentePath = null;
     private LinearLayout layoutBottomSheet;
-
+    public static Context context;
 
     public MapFragment() {
         // Required empty public constructor
@@ -135,7 +136,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        try {
 
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         super.onCreate(savedInstanceState);
     }
@@ -149,6 +154,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
         try {
+            context = getContext();
             setComponent(view);
             spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             activity = (MainActivity) getActivity();
@@ -272,10 +278,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void animateImage() {
         try {
 
-
-
-
-            if (immagineEsercentePath!=null) {
+            if (immagineEsercentePath != null) {
                 File fileImmagine = new File(immagineEsercentePath);
                 Bitmap myBitmap = BitmapFactory.decodeFile(fileImmagine.getAbsolutePath());
                 imageBehind.setImageBitmap(myBitmap);
@@ -323,12 +326,41 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             vantaggiBrevi = view.findViewById(R.id.vantaggi_brevi);
             layoutImmagine = view.findViewById(R.id.image_dietro);
             imageBehind = layoutImmagine.findViewById(R.id.image_behind_inside);
+            final View thisView = view;
+            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    int heightDiff = thisView.getRootView().getHeight() - thisView.getHeight();
+                    if (heightDiff > dpToPx(200)) { // if more than 200 dp, it's probably a keyboard...
+
+
+                    } else {
+                        MainActivity activity = (MainActivity) getActivity();
+                        if(activity!=null){
+                            activity.getWindow().getDecorView().setSystemUiVisibility(
+                                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                        }
+                    }
+                }
+            });
 
 
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
     }
+
+    public float dpToPx(float valueInDp) {
+        try{
+            DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+       return 0f;
+    }
+
 
     private void setMenuComponent(Menu menu) {
         try {
@@ -402,7 +434,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         0);
             }
-
 
 
             for (Supplier sup : LocalStorage.getListOfEsercentiFiltrataMappa()) {
@@ -487,7 +518,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                        String a="";
+                        String a = "";
                     }
 
                     @Override
@@ -516,7 +547,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 });
             }
-
 
 
             immagineEsercentePath = getContext().getFilesDir() + "/" + "immagineEsercente_" + esercenteSelezionato.id;
@@ -584,7 +614,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         if (activity != null) {
                             if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                callIntent.setData(Uri.parse("tel:"+esercenteSelezionato.phone));
+                                callIntent.setData(Uri.parse("tel:" + esercenteSelezionato.phone));
                                 startActivity(callIntent);
                             } else {
                                 // No explanation needed; request the permission
@@ -634,7 +664,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 @Override
                 public void onClick(View view) {
                     if (esercenteSelezionato != null && esercenteSelezionato.web != null) {
-                        String url = "http://"+esercenteSelezionato.web;
+                        String url = "http://" + esercenteSelezionato.web;
                         Intent i = new Intent(Intent.ACTION_VIEW);
                         i.setData(Uri.parse(url));
                         startActivity(i);
@@ -731,51 +761,59 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.search, menu);
+        try{
+            inflater.inflate(R.menu.search, menu);
 
-        setMenuComponent(menu);
+            setMenuComponent(menu);
 
-        customizeSearchView();
+            customizeSearchView();
 
-        changeSearchToNormalMode();
+            changeSearchToNormalMode();
 
-        //region MENU LISTENER
-        final SupportMenuItem menuNonCompat = (SupportMenuItem) menu.findItem(R.id.searchView);
-
-
-        menuNonCompat.setSupportOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                Log.d("TAG", "Collapsed");
-                changeSearchToNormalMode();
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                Log.d("TAG", "Expanded");
-                changeSearchToWhiteMode();
-                return true;
-            }
-        });
+            //region MENU LISTENER
+            final SupportMenuItem menuNonCompat = (SupportMenuItem) menu.findItem(R.id.searchView);
 
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            menuNonCompat.setSupportOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    Log.d("TAG", "Collapsed");
+                    changeSearchToNormalMode();
+                    return true;
+                }
 
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    Log.d("TAG", "Expanded");
+                    changeSearchToWhiteMode();
+                    return true;
+                }
+            });
 
-            @Override
-            public boolean onQueryTextChange(String query) {
 
-                return true;
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    LocalStorage.setTestoCercato(query);
+                    FilterHelper.filtraTotale(getActivity());
+                    return false;
+                }
 
-            }
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if(newText.equals("")){
+                        LocalStorage.setTestoCercato(newText);
+                        FilterHelper.filtraTotale(getActivity());
+                    }
+                    return false;
+                }
+            });
+            //endregion
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
 
-        });
-        //endregion
+        }
+
 
     }
 
@@ -794,8 +832,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void showModalBottomSheet() {
-        bottomSheetDialogFragment = new BottomSheet2DialogFragment();
-        bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        try {
+            bottomSheetDialogFragment = new BottomSheet2DialogFragment();
+            bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+
     }
 
 
@@ -933,75 +976,90 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
     private static void slideUpBottom(Context ctx, View v) {
-        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_down);
 
-        if (a != null) {
-            a.reset();
-            if (v != null) {
-                v.clearAnimation();
-                v.startAnimation(a);
+        try {
+            Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_down);
+
+            if (a != null) {
+                a.reset();
+                if (v != null) {
+                    v.clearAnimation();
+                    v.startAnimation(a);
+                }
             }
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
+
     }
 
 
     private static void slideUp(Context ctx, View v) {
-        Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_up);
+        try {
+            Animation a = AnimationUtils.loadAnimation(ctx, R.anim.slide_up);
 
-        if (a != null) {
-            a.reset();
-            if (v != null) {
-                v.clearAnimation();
-                v.startAnimation(a);
+            if (a != null) {
+                a.reset();
+                if (v != null) {
+                    v.clearAnimation();
+                    v.startAnimation(a);
+                }
             }
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
+
     }
 
 
     public static void retriveFilterAsyncTask() {
+        try {
+            esercentiArrayList = new ArrayList<Supplier>();
 
-        esercentiArrayList = new ArrayList<Supplier>();
-
-        String lingua = spref.getString("lingua", "");
-        RequestParams params = new RequestParams();
-        if (lingua.equals("Italiano")) {
-            params.put("lang", "it");
-        } else {
-            params.put("lang", "de");
-        }
-
-        SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                // If the response is JSONObject instead of expected JSONArray
+            String lingua = spref.getString("lingua", "");
+            RequestParams params = new RequestParams();
+            if (lingua.equals("Italiano")) {
+                params.put("lang", "it");
+            } else {
+                params.put("lang", "de");
             }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                // Pull out the first event on the public timeline
-                JSONObject firstEvent = null;
-                try {
-
-
-                    for (int i = 0; i < timeline.length(); i++) {
-                        firstEvent = (JSONObject) timeline.get(i);
-                        Supplier data = new Gson().fromJson(firstEvent.toString(), Supplier.class);
-                        esercentiArrayList.add(data);
-                    }
-
-                    LocalStorage.setListOfEsercenti(esercentiArrayList);
-                    LocalStorage.setListOfEsercentiFiltrataMappa(esercentiArrayList);
-
-
-                    FilterHelper.filtraTotale(activity);
-
-                    mapFragment.getMapAsync(contextMap);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    // If the response is JSONObject instead of expected JSONArray
                 }
 
-            }
-        });
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                    // Pull out the first event on the public timeline
+                    JSONObject firstEvent = null;
+                    try {
+
+
+                        for (int i = 0; i < timeline.length(); i++) {
+                            firstEvent = (JSONObject) timeline.get(i);
+                            Supplier data = new Gson().fromJson(firstEvent.toString(), Supplier.class);
+                            esercentiArrayList.add(data);
+                        }
+
+                        LocalStorage.setListOfEsercenti(esercentiArrayList);
+                        LocalStorage.setListOfEsercentiFiltrataMappa(esercentiArrayList);
+
+
+                        FilterHelper.filtraTotale(activity);
+
+                        mapFragment.getMapAsync(contextMap);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+
 
     }
 

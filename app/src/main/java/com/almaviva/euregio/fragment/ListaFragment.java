@@ -48,6 +48,7 @@ import com.almaviva.euregio.R;
 import com.almaviva.euregio.adapter.EsercenteListAdapter;
 import com.almaviva.euregio.behavior.AnchorBottomSheetBehavior;
 import com.almaviva.euregio.helper.BottomSheet3DialogFragment;
+import com.almaviva.euregio.helper.DebouncedQueryTextListener;
 import com.almaviva.euregio.helper.FilterHelper;
 import com.almaviva.euregio.helper.LocalStorage;
 import com.almaviva.euregio.mock.SupplierRestClient;
@@ -95,8 +96,8 @@ public class ListaFragment extends Fragment {
     public static String risultati;
     public static String risultato;
     public static SwipeRefreshLayout swipeLayout;
-    public static  SharedPreferences spref;
-
+    public static SharedPreferences spref;
+    public static ProgressBar progressBarLista;
 
     public ListaFragment() {
         // Required empty public constructor
@@ -105,6 +106,7 @@ public class ListaFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
     }
 
@@ -113,20 +115,20 @@ public class ListaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
-        spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        activity= getContext();
         View view = inflater.inflate(R.layout.fragment_lista, container, false);
         try {
+
+            spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            activity = getContext();
             setHasOptionsMenu(true);
             risultati = getString(R.string.risultati);
             risultato = getString(R.string.risultato);
             findComponentInView(view);
+            progressBarLista.setVisibility(View.VISIBLE);
             setComponent();
             getEsercenti();
 
             setFiltriDaImpostazioni();
-
 
             //LISTENER
             esercentiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -181,50 +183,72 @@ public class ListaFragment extends Fragment {
 
 
     private void setFiltriDaImpostazioni() {
+        try {
+            textViewFiltroOrdine.setText(LocalStorage.getFiltriOrdine());
+            LocalStorage.setTestoCercato("");
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
 
-        textViewFiltroOrdine.setText(LocalStorage.getFiltriOrdine());
-        LocalStorage.setTestoCercato("");
 
     }
 
     private void animateIconaFiltro() {
-
-        if (LocalStorage.getIsDecrescente()) {
-            rotateDown(getActivity(), iconOrdine);
-            LocalStorage.setIsDecrescente(false);
-        } else {
-            rotateUp(getActivity(), iconOrdine);
-            LocalStorage.setIsDecrescente(true);
+        try {
+            if (LocalStorage.getIsDecrescente()) {
+                rotateDown(getActivity(), iconOrdine);
+                LocalStorage.setIsDecrescente(false);
+            } else {
+                rotateUp(getActivity(), iconOrdine);
+                LocalStorage.setIsDecrescente(true);
+            }
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
+
     }
 
     private void rotateUp(Activity activity, View v) {
-        Animation a = AnimationUtils.loadAnimation(activity, R.anim.rotate_up);
-        a.setFillAfter(true);
-        if (a != null) {
-            a.reset();
-            if (v != null) {
-                v.clearAnimation();
-                v.startAnimation(a);
+        try {
+            Animation a = AnimationUtils.loadAnimation(activity, R.anim.rotate_up);
+            a.setFillAfter(true);
+            if (a != null) {
+                a.reset();
+                if (v != null) {
+                    v.clearAnimation();
+                    v.startAnimation(a);
+                }
             }
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
+
     }
 
     private void rotateDown(Activity activity, View v) {
-        Animation a = AnimationUtils.loadAnimation(activity, R.anim.rotate_down);
-        a.setFillAfter(true);
-        if (a != null) {
-            a.reset();
-            if (v != null) {
-                v.clearAnimation();
-                v.startAnimation(a);
+        try {
+            Animation a = AnimationUtils.loadAnimation(activity, R.anim.rotate_down);
+            a.setFillAfter(true);
+            if (a != null) {
+                a.reset();
+                if (v != null) {
+                    v.clearAnimation();
+                    v.startAnimation(a);
+                }
             }
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
+
     }
 
     public void showModalBottomSheet() {
-        bottomSheetDialogFragment = new BottomSheet3DialogFragment();
-        bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        try {
+            bottomSheetDialogFragment = new BottomSheet3DialogFragment();
+            bottomSheetDialogFragment.show(getActivity().getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
     }
 
 
@@ -260,49 +284,50 @@ public class ListaFragment extends Fragment {
     }
 
     public void getEsercenti() throws ParseException {
-
-
         try {
             esercentiArrayList = new ArrayList<Supplier>();
-
-
             if (LocalStorage.getListOfEsercenti().size() == 0) {
                 retriveFilterAsyncTask();
-            }else{
+            } else {
                 FilterHelper.filtraTotale(getActivity());
             }
-
-
-
-
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
     }
 
     private void setComponent() {
-        esercentiList.setDivider(null);
-        esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Supplier>());
-        esercentiList.setAdapter(esercenteListAdapter);
+        try {
+            esercentiList.setDivider(null);
+            esercenteListAdapter = new EsercenteListAdapter(getActivity(), new ArrayList<Supplier>());
+            esercentiList.setAdapter(esercenteListAdapter);
 
+            swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    retriveFilterAsyncTask();
+                }
+            });
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
 
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                retriveFilterAsyncTask();
-            }
-        });
 
     }
 
     private void findComponentInView(View view) {
-        esercentiList = (ListView) view.findViewById(R.id.esercenti_list);
-        textViewNumeroRisultati = (TextView) view.findViewById(R.id.textView_numero_risultati);
-        textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
-        iconOrdine = (ImageView) view.findViewById(R.id.iconFilterAlfabetico);
-        textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
-        //progressBarLista = (ProgressBar) view.findViewById(R.id.progressBarLista);
-        swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeLayout);
+        try {
+            esercentiList = (ListView) view.findViewById(R.id.esercenti_list);
+            textViewNumeroRisultati = (TextView) view.findViewById(R.id.textView_numero_risultati);
+            textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
+            iconOrdine = (ImageView) view.findViewById(R.id.iconFilterAlfabetico);
+            textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
+            progressBarLista = (ProgressBar) view.findViewById(R.id.progressBarLista);
+            swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeLayout);
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+
     }
 
     private void setMenuComponent(Menu menu) {
@@ -322,69 +347,58 @@ public class ListaFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.search, menu);
+        try {
+            inflater.inflate(R.menu.search, menu);
 
-        setMenuComponent(menu);
+            setMenuComponent(menu);
 
-        customizeSearchView();
+            customizeSearchView();
 
-        changeSearchToNormalMode();
-        //region MENU LISTENER
-        final SupportMenuItem menuNonCompat = (SupportMenuItem) menu.findItem(R.id.searchView);
-
-
-        menuNonCompat.setSupportOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                Log.d("TAG", "Collapsed");
-                changeSearchToNormalMode();
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                Log.d("TAG", "Expanded");
-                changeSearchToWhiteMode();
-                return true;
-            }
-        });
+            changeSearchToNormalMode();
+            //region MENU LISTENER
+            final SupportMenuItem menuNonCompat = (SupportMenuItem) menu.findItem(R.id.searchView);
 
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            menuNonCompat.setSupportOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    Log.d("TAG", "Collapsed");
+                    changeSearchToNormalMode();
+                    return true;
+                }
 
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-
-
-                final String textCercato = query;
-
-                // Remove all previous callbacks.
-                Handler handler = new Handler();
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    Log.d("TAG", "Expanded");
+                    changeSearchToWhiteMode();
+                    return true;
+                }
+            });
 
 
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    LocalStorage.setTestoCercato(query);
+                    FilterHelper.filtraTotale(getActivity());
+                    return false;
+                }
 
-                        LocalStorage.setTestoCercato(textCercato);
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if (newText.equals("")) {
+                        LocalStorage.setTestoCercato(newText);
                         FilterHelper.filtraTotale(getActivity());
                     }
-                };
+                    return false;
+                }
+            });
 
-                handler.removeCallbacks(runnable);
-                handler.postDelayed(runnable, 5000);
-                return false;
+            //endregion
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
 
-            }
-
-        });
-
-        //endregion
 
     }
 
@@ -405,43 +419,52 @@ public class ListaFragment extends Fragment {
 
 
     private void changeSearchToNormalMode() {
-        Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
+        try {
+            Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
 
-        if (numero_risultati == 1) {
-            filter.setIcon(R.drawable.icon_settingswhite1);
-        } else if (numero_risultati == 2) {
-            filter.setIcon(R.drawable.icon_settingswhite2);
-        } else {
-            filter.setIcon(R.drawable.icon_settingswhite);
+            if (numero_risultati == 1) {
+                filter.setIcon(R.drawable.icon_settingswhite1);
+            } else if (numero_risultati == 2) {
+                filter.setIcon(R.drawable.icon_settingswhite2);
+            } else {
+                filter.setIcon(R.drawable.icon_settingswhite);
+            }
+
+            if (transition == null) {
+                transition = (TransitionDrawable) toolbar.getBackground();
+            }
+
+            if (isSearchWhite) {
+                transition.reverseTransition(300);
+            }
+            isSearchWhite = false;
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
 
-        if (transition == null) {
-            transition = (TransitionDrawable) toolbar.getBackground();
-        }
 
-        if (isSearchWhite) {
-            transition.reverseTransition(300);
-        }
-        isSearchWhite = false;
     }
 
     private void changeSearchToWhiteMode() {
+        try {
+            Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
 
-        Integer numero_risultati = LocalStorage.getNumberOfFilterSet();
+            if (numero_risultati == 1) {
+                filter.setIcon(R.drawable.icon_settingsgray1);
+            } else if (numero_risultati == 2) {
+                filter.setIcon(R.drawable.icon_settingsgray2);
+            } else {
+                filter.setIcon(R.drawable.icon_settingsgrey);
+            }
+            if (transition == null) {
+                transition = (TransitionDrawable) toolbar.getBackground();
+            }
 
-        if (numero_risultati == 1) {
-            filter.setIcon(R.drawable.icon_settingsgray1);
-        } else if (numero_risultati == 2) {
-            filter.setIcon(R.drawable.icon_settingsgray2);
-        } else {
-            filter.setIcon(R.drawable.icon_settingsgrey);
+            transition.startTransition(300);
+            isSearchWhite = true;
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
-        if (transition == null) {
-            transition = (TransitionDrawable) toolbar.getBackground();
-        }
-
-        transition.startTransition(300);
-        isSearchWhite = true;
 
     }
 
@@ -497,55 +520,59 @@ public class ListaFragment extends Fragment {
 
 
     public static void retriveFilterAsyncTask() {
+        try {
+            // progressBarLista.setVisibility(View.VISIBLE);
+            esercentiArrayList = new ArrayList<Supplier>();
 
-        // progressBarLista.setVisibility(View.VISIBLE);
-        esercentiArrayList = new ArrayList<Supplier>();
-
-        String lingua = spref.getString("lingua", "");
-        RequestParams params = new RequestParams();
-        if(lingua.equals("Italiano")){
-            params.put("lang","it");
-        }else{
-            params.put("lang","de");
-        }
-
-        SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                // If the response is JSONObject instead of expected JSONArray
+            String lingua = spref.getString("lingua", "");
+            RequestParams params = new RequestParams();
+            if (lingua.equals("Italiano")) {
+                params.put("lang", "it");
+            } else {
+                params.put("lang", "de");
             }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                // Pull out the first event on the public timeline
-                JSONObject firstEvent = null;
-                try {
-
-
-                    for (int i = 0; i < timeline.length(); i++) {
-                        firstEvent = (JSONObject) timeline.get(i);
-                        Supplier data = new Gson().fromJson(firstEvent.toString(), Supplier.class);
-                        esercentiArrayList.add(data);
-                    }
-
-                    LocalStorage.setListOfEsercenti(esercentiArrayList);
-
-
-                    FilterHelper.filtraTotale(activity);
-
-                    esercenteListAdapter.add(LocalStorage.getListOfEsercentiFiltrata());
-                    esercenteListAdapter.notifyDataSetChanged();
-
-
-                    //   progressBarLista.setVisibility(View.GONE);
-                    swipeLayout.setRefreshing(false);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    // If the response is JSONObject instead of expected JSONArray
                 }
 
-            }
-        });
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                    // Pull out the first event on the public timeline
+                    JSONObject firstEvent = null;
+                    try {
+
+
+                        for (int i = 0; i < timeline.length(); i++) {
+                            firstEvent = (JSONObject) timeline.get(i);
+                            Supplier data = new Gson().fromJson(firstEvent.toString(), Supplier.class);
+                            esercentiArrayList.add(data);
+                        }
+
+                        LocalStorage.setListOfEsercenti(esercentiArrayList);
+
+
+                        FilterHelper.filtraTotale(activity);
+
+                        esercenteListAdapter.add(LocalStorage.getListOfEsercentiFiltrata());
+                        esercenteListAdapter.notifyDataSetChanged();
+
+
+                        progressBarLista.setVisibility(View.GONE);
+                        swipeLayout.setRefreshing(false);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+
 
     }
 }

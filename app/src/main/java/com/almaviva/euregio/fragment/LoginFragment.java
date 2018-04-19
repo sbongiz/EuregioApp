@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.almaviva.euregio.MainActivity;
@@ -55,6 +57,8 @@ public class LoginFragment extends Fragment {
     private SharedPreferences spref;
     private RequestParams loginParams;
     private static Context context;
+    public static ProgressBar progressBar;
+    private static boolean isOtherDownloaded = false;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -71,168 +75,208 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+        try {
+            context = getContext();
+            findComponentInView(view);
 
-        context = getContext();
-        findComponentInView(view);
 
+            //LISTENER
 
-        //LISTENER
+            buttonAvanti.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    login();
+                }
+            });
 
-        buttonAvanti.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                login();
-            }
-        });
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
 
 
         return view;
     }
 
     private void login() {
-        String codiceFiscale = editCodFisc.getText().toString();
-        String numeroCarta = editNumCarta.getText().toString();
+        try {
+            String codiceFiscale = editCodFisc.getText().toString();
+            String numeroCarta = editNumCarta.getText().toString();
 
-        spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        loginParams = new RequestParams();
+            loginParams = new RequestParams();
 
-        codiceFiscale = codiceFiscale.trim();
-        numeroCarta = numeroCarta.trim();
-        loginParams.put("fc", codiceFiscale);
-        loginParams.put("cardNumber", numeroCarta);
-        loginParams.put("side", "front");
+            codiceFiscale = codiceFiscale.trim();
+            numeroCarta = numeroCarta.trim();
+            loginParams.put("fc", codiceFiscale);
+            loginParams.put("cardNumber", numeroCarta);
+            loginParams.put("side", "front");
 
-        CardRestClient.get("", loginParams, new FileAsyncHttpResponseHandler(getActivity()) {
+            CardRestClient.get("", loginParams, new FileAsyncHttpResponseHandler(getActivity()) {
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                Context context = getContext();
-                CharSequence text = getString(R.string.errore_login);
-                int duration = Toast.LENGTH_SHORT;
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
+                    Context context = getContext();
+                    CharSequence text = getString(R.string.errore_login);
+                    int duration = Toast.LENGTH_SHORT;
 
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
 
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putBoolean("isLogged", false);
-                editor.commit();
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, File file) {
-
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putBoolean("isLogged", true);
-                editor.commit();
-
-
-                File fileNuovo = new File(getContext().getFilesDir(), "cardFronte");
-
-                try {
-
-                    InputStream is = new FileInputStream(file);
-                    OutputStream os = new FileOutputStream(fileNuovo);
-                    byte[] buff = new byte[1024];
-                    int len;
-                    while ((len = is.read(buff)) > 0) {
-                        os.write(buff, 0, len);
-                    }
-                    is.close();
-                    os.close();
-
-                    editor.putString("card_fronte_path", fileNuovo.getAbsolutePath());
+                    SharedPreferences.Editor editor = spref.edit();
+                    editor.putBoolean("isLogged", false);
                     editor.commit();
 
-                } catch (IOException e) {
-
+                    progressBar.setVisibility(View.GONE);
                 }
-            }
-        });
 
-        loginParams.put("fc", codiceFiscale);
-        loginParams.put("cardNumber", numeroCarta);
-        loginParams.put("side", "back");
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, File file) {
 
-        CardRestClient.get("", loginParams, new FileAsyncHttpResponseHandler(getActivity()) {
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                Context context = getContext();
-                CharSequence text = getString(R.string.errore_login);
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putBoolean("isLogged", false);
-                editor.commit();
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, File file) {
-
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putBoolean("isLogged", true);
-                editor.commit();
+                    SharedPreferences.Editor editor = spref.edit();
 
 
-                File fileNuovo = new File(getContext().getFilesDir(), "cardRetro");
-                try {
+                    File fileNuovo = new File(getContext().getFilesDir(), "cardFronte");
 
-                    InputStream is = new FileInputStream(file);
-                    OutputStream os = new FileOutputStream(fileNuovo);
-                    byte[] buff = new byte[1024];
-                    int len;
-                    while ((len = is.read(buff)) > 0) {
-                        os.write(buff, 0, len);
+                    try {
+
+                        InputStream is = new FileInputStream(file);
+                        OutputStream os = new FileOutputStream(fileNuovo);
+                        byte[] buff = new byte[1024];
+                        int len;
+                        while ((len = is.read(buff)) > 0) {
+                            os.write(buff, 0, len);
+                        }
+                        is.close();
+                        os.close();
+
+                        editor.putString("card_fronte_path", fileNuovo.getAbsolutePath());
+                        editor.commit();
+
+                        editor.putBoolean("isLogged", true);
+                        editor.commit();
+
+
+                        if (isOtherDownloaded) {
+                            MainActivity main = (MainActivity) getActivity();
+                            main.bottomNavigation.setSelectedItemId(R.id.navigation_euregio);
+                        }
+
+                        isOtherDownloaded = true;
+
+
+                    } catch (IOException e) {
+
                     }
-                    is.close();
-                    os.close();
+                }
+            });
 
-                    editor.putString("card_retro_path", fileNuovo.getAbsolutePath());
+            loginParams.put("fc", codiceFiscale);
+            loginParams.put("cardNumber", numeroCarta);
+            loginParams.put("side", "back");
+
+            CardRestClient.get("", loginParams, new FileAsyncHttpResponseHandler(getActivity()) {
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
+                    Context context = getContext();
+                    CharSequence text = getString(R.string.errore_login);
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+
+                    SharedPreferences.Editor editor = spref.edit();
+                    editor.putBoolean("isLogged", false);
                     editor.commit();
 
-                    MainActivity main = (MainActivity) getActivity();
-                    main.bottomNavigation.setSelectedItemId(R.id.navigation_euregio);
-                } catch (IOException e) {
+                    progressBar.setVisibility(View.GONE);
 
                 }
-            }
-        });
 
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, File file) {
+                    SharedPreferences.Editor editor = spref.edit();
+
+
+                    File fileNuovo = new File(getContext().getFilesDir(), "cardRetro");
+                    try {
+
+                        InputStream is = new FileInputStream(file);
+                        OutputStream os = new FileOutputStream(fileNuovo);
+                        byte[] buff = new byte[1024];
+                        int len;
+                        while ((len = is.read(buff)) > 0) {
+                            os.write(buff, 0, len);
+                        }
+                        is.close();
+                        os.close();
+
+                        editor.putString("card_retro_path", fileNuovo.getAbsolutePath());
+                        editor.commit();
+
+
+                        editor.putBoolean("isLogged", true);
+                        editor.commit();
+
+                        progressBar.setVisibility(View.GONE);
+
+                        if (isOtherDownloaded) {
+                            MainActivity main = (MainActivity) getActivity();
+                            main.bottomNavigation.setSelectedItemId(R.id.navigation_euregio);
+                        }
+
+                        isOtherDownloaded = true;
+                    } catch (IOException e) {
+
+                    }
+                }
+            });
+
+
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
 
     }
 
 
     public void findComponentInView(View view) {
+        try {
+            logo = view.findViewById(R.id.logo_grande);
+            editCodFisc = view.findViewById(R.id.edit_codf);
+            editNumCarta = view.findViewById(R.id.edit_cardnumber);
+            buttonAvanti = view.findViewById(R.id.button_login);
+            progressBar = view.findViewById(R.id.progressBar);
+            final View thisView = view;
+            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    int heightDiff = thisView.getRootView().getHeight() - thisView.getHeight();
+                    if (heightDiff > dpToPx(200)) { // if more than 200 dp, it's probably a keyboard...
 
-        logo = view.findViewById(R.id.logo_grande);
-        editCodFisc = view.findViewById(R.id.edit_codf);
-        editNumCarta = view.findViewById(R.id.edit_cardnumber);
-        buttonAvanti = view.findViewById(R.id.button_login);
-        final View thisView = view;
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                int heightDiff = thisView.getRootView().getHeight() - thisView.getHeight();
-                if (heightDiff > dpToPx(200)) { // if more than 200 dp, it's probably a keyboard...
-
-                    logo.setVisibility(View.GONE);
-                }else{
-                    logo.setVisibility(View.VISIBLE);
+                        logo.setVisibility(View.GONE);
+                    } else {
+                        logo.setVisibility(View.VISIBLE);
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+
     }
 
     public static float dpToPx(float valueInDp) {
 
-
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
+        try {
+            DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+       return 0f;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -264,9 +308,6 @@ public class LoginFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
-
-
 
 
 }

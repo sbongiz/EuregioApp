@@ -15,6 +15,7 @@ import com.almaviva.euregio.mock.DistrictRestClient;
 import com.almaviva.euregio.model.Category;
 import com.almaviva.euregio.model.District;
 import com.almaviva.euregio.model.Location;
+import com.almaviva.euregio.model.Product;
 import com.almaviva.euregio.model.Supplier;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -62,7 +63,9 @@ public class FilterHelper {
 
             filtraListaPerOrdine(con, isDescrescente);
 
-            filtraListaPerTesto(testoCercato);
+            if(LocalStorage.getTestoCercato()!= null && LocalStorage.getTestoCercato()!= ""){
+                filtraListaPerTesto(testoCercato);
+            }
 
             aggiornaComponentInListaFragment(con);
         } catch (Exception e) {
@@ -80,7 +83,62 @@ public class FilterHelper {
         arrayEsercentiFiltrato = LocalStorage.getListOfEsercentiFiltrata();
 
 
-        //DO MAGIC THINGS
+        Iterator<Supplier> iter = arrayEsercentiFiltrato.iterator();
+
+
+        while (iter.hasNext()) {
+            boolean trovato = false;
+            Supplier sup = iter.next();
+
+            if(sup.title!=null && sup.title.contains(testoCercato)){
+                trovato=true;
+            }
+
+            if(sup.location!=null && sup.location.description!=null && sup.location.description.contains(testoCercato)){
+                trovato = true;
+            }
+
+            if(sup.location!=null && sup.location.municipality!=null &&sup.location.municipality.contains(testoCercato)){
+                trovato=true;
+            }
+
+            if(sup.location!=null && sup.location.district != null && sup.location.district.name != null && sup.location.district.name.contains(testoCercato)){
+                trovato=true;
+            }
+
+
+            if(sup.email != null && sup.email.contains(testoCercato)){
+                trovato=true;
+            }
+
+            if(sup.web != null && sup.web.contains(testoCercato)){
+                trovato=true;
+            }
+
+            for (Category cat:sup.categories) {
+
+                if(cat.name != null && cat.name.contains(testoCercato)){
+                    trovato=true;
+                }
+
+            }
+
+            for (Product prod:sup.products) {
+                if(prod.descriptionShort !=null && prod.descriptionShort.contains(testoCercato)){
+                    trovato=true;
+                }
+                if(prod.description !=null && prod.description.contains(testoCercato)){
+                    trovato=true;
+                }
+            }
+
+            if(!trovato){
+                iter.remove();
+            }
+
+        }
+
+
 
         LocalStorage.setListOfEsercentiFiltrata(arrayEsercentiFiltrato);
     }

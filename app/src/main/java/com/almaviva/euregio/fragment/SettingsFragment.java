@@ -45,6 +45,7 @@ public class SettingsFragment extends PreferenceFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+
         spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         PreferenceScreen screenPrincipale = getPreferenceManager().createPreferenceScreen(getActivity());

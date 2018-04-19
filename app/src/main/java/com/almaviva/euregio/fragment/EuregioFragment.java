@@ -54,20 +54,12 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         View view;
-
-
         view = inflater.inflate(R.layout.fragment_euregio, container, false);
-
-
         try {
-
             findComponentInView(view);
             image.setVisibility(View.VISIBLE);
-
             spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
 
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
@@ -77,29 +69,35 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        pathFronte = spref.getString("card_fronte_path", "");
-        pathRetro = spref.getString("card_retro_path", "");
 
-        if (pathFronte != "") {
-            fileFronte = new File(pathFronte);
-        }
+        try{
+            pathFronte = spref.getString("card_fronte_path", "");
+            pathRetro = spref.getString("card_retro_path", "");
 
-        if (pathRetro != "") {
-            fileRetro = new File(pathRetro);
-        }
-
-        String fronteRetro = spref.getString("fronte_retro", "");
-
-        if(fileFronte != null && fileRetro != null){
-            if(fronteRetro.equals("front")){
-                Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
-                image.setImageBitmap(myBitmap);
-                isBackOfCardShowing=false;
-            }else{
-                Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
-                image.setImageBitmap(myBitmap);
-                isBackOfCardShowing = true;
+            if (pathFronte != "") {
+                fileFronte = new File(pathFronte);
             }
+
+            if (pathRetro != "") {
+                fileRetro = new File(pathRetro);
+            }
+
+            String fronteRetro = spref.getString("fronte_retro", "");
+
+            if(fileFronte != null && fileRetro != null){
+                if(fronteRetro.equals("front")){
+                    Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
+                    image.setImageBitmap(myBitmap);
+                    isBackOfCardShowing=false;
+                }else{
+                    Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
+                    image.setImageBitmap(myBitmap);
+                    isBackOfCardShowing = true;
+                }
+            }
+
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
 
 
@@ -107,48 +105,53 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
     }
 
     private void findComponentInView(View view) {
-        image = (ImageView) view.findViewById(R.id.card_image);
-        toMiddle = AnimationUtils.loadAnimation(getActivity(), R.anim.to_middle);
-        fromMiddle = AnimationUtils.loadAnimation(getActivity(), R.anim.from_middle);
-        toMiddle.setAnimationListener(this);
-        fromMiddle.setAnimationListener(this);
+        try{
+            image = (ImageView) view.findViewById(R.id.card_image);
+            toMiddle = AnimationUtils.loadAnimation(getActivity(), R.anim.to_middle);
+            fromMiddle = AnimationUtils.loadAnimation(getActivity(), R.anim.from_middle);
+            toMiddle.setAnimationListener(this);
+            fromMiddle.setAnimationListener(this);
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                flipIt(image);
-            }
-        });
+                    flipIt(image);
+                }
+            });
 
-        FloatingActionButton fabLogout = (FloatingActionButton) view.findViewById(R.id.fabLogout);
-        fabLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            FloatingActionButton fabLogout = (FloatingActionButton) view.findViewById(R.id.fabLogout);
+            fabLogout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                SharedPreferences.Editor editor = spref.edit();
-                editor.putBoolean("isLogged", false);
-                editor.commit();
+                    SharedPreferences.Editor editor = spref.edit();
+                    editor.putBoolean("isLogged", false);
+                    editor.commit();
 
 
-                editor.putString("card_fronte_path", "");
-                editor.commit();
-                editor.putString("card_retro_path", "");
-                editor.commit();
+                    editor.putString("card_fronte_path", "");
+                    editor.commit();
+                    editor.putString("card_retro_path", "");
+                    editor.commit();
 
-                MainActivity main = (MainActivity) getActivity();
-                main.bottomNavigation.setSelectedItemId(R.id.navigation_euregio);
+                    MainActivity main = (MainActivity) getActivity();
+                    main.bottomNavigation.setSelectedItemId(R.id.navigation_euregio);
 
-                Context context = getContext();
-                CharSequence text = getString(R.string.logout);
-                int duration = Toast.LENGTH_SHORT;
+                    Context context = getContext();
+                    CharSequence text = getString(R.string.logout);
+                    int duration = Toast.LENGTH_SHORT;
 
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
 
-            }
-        });
+                }
+            });
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+
 
     }
 
@@ -183,27 +186,37 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
 
     @Override
     public void onAnimationEnd(Animation animation) {
-        if (animation == toMiddle) {
+        try{
+            if (animation == toMiddle) {
 
-            image.clearAnimation();
-            image.setAnimation(fromMiddle);
-            image.startAnimation(fromMiddle);
-            SharedPreferences.Editor editor = spref.edit();
-            if (isBackOfCardShowing) {
+                image.clearAnimation();
+                image.setAnimation(fromMiddle);
+                image.startAnimation(fromMiddle);
+                SharedPreferences.Editor editor = spref.edit();
+                if (isBackOfCardShowing) {
 
-                editor.putString("fronte_retro","front");
-                editor.commit();
-                Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
-                image.setImageBitmap(myBitmap);
+                    editor.putString("fronte_retro","front");
+                    editor.commit();
+                    Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
+
+                    if(myBitmap!=null){
+                        image.setImageBitmap(myBitmap);
+                    }
+                } else {
+                    editor.putString("fronte_retro","retro");
+                    editor.commit();
+                    Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
+                    if(myBitmap!=null){
+                        image.setImageBitmap(myBitmap);
+                    }
+                }
             } else {
-                editor.putString("fronte_retro","retro");
-                editor.commit();
-                Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
-                image.setImageBitmap(myBitmap);
+                isBackOfCardShowing = !isBackOfCardShowing;
             }
-        } else {
-            isBackOfCardShowing = !isBackOfCardShowing;
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
+
     }
 
     @Override
@@ -217,8 +230,12 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
     }
 
     private void flipIt(final View viewToFlip) {
-        image.clearAnimation();
-        image.setAnimation(toMiddle);
-        image.startAnimation(toMiddle);
+        try {
+            image.clearAnimation();
+            image.setAnimation(toMiddle);
+            image.startAnimation(toMiddle);
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
     }
 }
