@@ -160,13 +160,13 @@ public class FilterHelper {
         } else {
 
 
-            int metri = 50;
+            int metri = 5;
 
-            long myLongLong = 0;
-            long myLatLong = 0;
+            double myLongLong = 0;
+            double myLatLong = 0;
             if (LocalStorage.getMyLastKnownLocation() != null) {
-                myLongLong = Double.doubleToLongBits(LocalStorage.getMyLastKnownLocation().longitude);
-                myLatLong = Double.doubleToLongBits(LocalStorage.getMyLastKnownLocation().latitude);
+                myLongLong = Double.valueOf(LocalStorage.getMyLastKnownLocation().longitude);
+                myLatLong = Double.valueOf(LocalStorage.getMyLastKnownLocation().latitude);
 
 
                 Iterator<Supplier> iter = arrayEsercentiFiltrato.iterator();
@@ -176,15 +176,22 @@ public class FilterHelper {
 
                     Supplier sup = iter.next();
 
-                    long esercenteLongLong = Long.getLong(sup.location.lon);
-                    long esercdenteLatLong = Long.getLong(sup.location.lat);
-                    boolean isInRadius = (metri * 111000f) >= sqrt((myLongLong - esercenteLongLong) ^ 2 + (myLatLong - esercdenteLatLong) ^ 2);
+
+
+
+                   // float distanceInMeters =  targetLocation.distanceTo(myLocation);
+
+                    double esercenteLongLong = Double.valueOf(sup.location.lon);
+                    double esercdenteLatLong = Double.valueOf(sup.location.lat);
+                    boolean isInRadius = (metri * 111000f) >= sqrt(Math.pow(myLongLong-esercenteLongLong,2) + Math.pow(myLatLong-esercdenteLatLong,2));
 
                     if (!isInRadius) {
                         iter.remove();
                     }
 
                 }
+            }else{
+                //ATTENZIONE PER QUESTO TIPO DI ORDINAMENTO ATTIVARTE LOCALIZZAZIONE
             }
 
         }
@@ -426,11 +433,16 @@ public class FilterHelper {
                 editor.putString("ordinamento_esercenti", con.getString(R.string.lista_data));
                 editor.commit();
                 LocalStorage.setFiltroOrdine(con.getString(R.string.data_aggiornamento));
-            } else {
+            } else if(ordinamentoEsercenti.equals(con.getString(R.string.alfabetico))){
                 SharedPreferences.Editor editor = spref.edit();
                 editor.putString("ordinamento_esercenti", con.getString(R.string.lista_alfabetica));
                 editor.commit();
                 LocalStorage.setFiltroOrdine(con.getString(R.string.alfabetico));
+            }else{
+                SharedPreferences.Editor editor = spref.edit();
+                editor.putString("ordinamento_esercenti", con.getString(R.string.title_mappa));
+                editor.commit();
+                LocalStorage.setFiltroOrdine(con.getString(R.string.title_mappa));
             }
 
         }

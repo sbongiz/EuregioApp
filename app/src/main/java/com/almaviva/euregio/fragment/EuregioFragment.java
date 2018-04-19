@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.almaviva.euregio.MainActivity;
 import com.almaviva.euregio.R;
@@ -36,7 +38,8 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
     private File fileFronte;
     private File fileRetro;
     private SharedPreferences spref;
-
+    private  String pathFronte;
+    private String pathRetro;
     public EuregioFragment() {
         // Required empty public constructor
     }
@@ -61,33 +64,9 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
         try {
 
             findComponentInView(view);
-
+            image.setVisibility(View.VISIBLE);
 
             spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-            String pathFronte = spref.getString("card_fronte_path", "");
-            String pathRetro = spref.getString("card_retro_path", "");
-
-            if (pathFronte != "") {
-                fileFronte = new File(pathFronte);
-            }
-
-            if (pathRetro != "") {
-                fileRetro = new File(pathRetro);
-            }
-
-            String fronteRetro = spref.getString("fronte_retro", "");
-
-            if(fronteRetro.equals("front")){
-                Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
-                image.setImageBitmap(myBitmap);
-            }else{
-                Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
-                image.setImageBitmap(myBitmap);
-            }
-
-
-
 
 
         } catch (Exception e) {
@@ -96,6 +75,36 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
         return view;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        pathFronte = spref.getString("card_fronte_path", "");
+        pathRetro = spref.getString("card_retro_path", "");
+
+        if (pathFronte != "") {
+            fileFronte = new File(pathFronte);
+        }
+
+        if (pathRetro != "") {
+            fileRetro = new File(pathRetro);
+        }
+
+        String fronteRetro = spref.getString("fronte_retro", "");
+
+        if(fileFronte != null && fileRetro != null){
+            if(fronteRetro.equals("front")){
+                Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
+                image.setImageBitmap(myBitmap);
+                isBackOfCardShowing=false;
+            }else{
+                Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
+                image.setImageBitmap(myBitmap);
+                isBackOfCardShowing = true;
+            }
+        }
+
+
+        super.onViewCreated(view, savedInstanceState);
+    }
 
     private void findComponentInView(View view) {
         image = (ImageView) view.findViewById(R.id.card_image);
@@ -108,7 +117,7 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //image.setImageResource(R.drawable.card_retro);
+
                 flipIt(image);
             }
         });
@@ -130,6 +139,13 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
 
                 MainActivity main = (MainActivity) getActivity();
                 main.bottomNavigation.setSelectedItemId(R.id.navigation_euregio);
+
+                Context context = getContext();
+                CharSequence text = getString(R.string.logout);
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
 
             }
         });
@@ -172,10 +188,16 @@ public class EuregioFragment extends Fragment implements Animation.AnimationList
             image.clearAnimation();
             image.setAnimation(fromMiddle);
             image.startAnimation(fromMiddle);
+            SharedPreferences.Editor editor = spref.edit();
             if (isBackOfCardShowing) {
+
+                editor.putString("fronte_retro","front");
+                editor.commit();
                 Bitmap myBitmap = BitmapFactory.decodeFile(fileFronte.getAbsolutePath());
                 image.setImageBitmap(myBitmap);
             } else {
+                editor.putString("fronte_retro","retro");
+                editor.commit();
                 Bitmap myBitmap = BitmapFactory.decodeFile(fileRetro.getAbsolutePath());
                 image.setImageBitmap(myBitmap);
             }

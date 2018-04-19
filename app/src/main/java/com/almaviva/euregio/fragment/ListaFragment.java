@@ -504,9 +504,9 @@ public class ListaFragment extends Fragment {
         String lingua = spref.getString("lingua", "");
         RequestParams params = new RequestParams();
         if(lingua.equals("Italiano")){
-            params.put("","it");
+            params.put("lang","it");
         }else{
-            params.put("","de");
+            params.put("lang","de");
         }
 
         SupplierRestClient.get("", null, new JsonHttpResponseHandler() {

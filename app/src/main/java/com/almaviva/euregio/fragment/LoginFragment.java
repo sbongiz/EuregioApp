@@ -95,7 +95,6 @@ public class LoginFragment extends Fragment {
         String numeroCarta = editNumCarta.getText().toString();
 
         spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        final String fronteRetro = spref.getString("fronte_retro", "");
 
         loginParams = new RequestParams();
 

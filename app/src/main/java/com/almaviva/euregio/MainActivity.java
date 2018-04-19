@@ -333,15 +333,15 @@ public class MainActivity extends AppCompatActivity implements VantaggiFragment.
 
     }
 
-    //  @Override
-    //  public void onWindowFocusChanged(boolean hasFocus) {
-    //      super.onWindowFocusChanged(hasFocus);
-    //      if (hasFocus) {
-    //          getWindow().getDecorView().setSystemUiVisibility(
-    //                  View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-    //                          | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-    //      }
-    //  }
+      @Override
+      public void onWindowFocusChanged(boolean hasFocus) {
+          super.onWindowFocusChanged(hasFocus);
+          if (hasFocus) {
+              getWindow().getDecorView().setSystemUiVisibility(
+                      View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                              | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+          }
+      }
     //endregion
 
     //region LISTENER

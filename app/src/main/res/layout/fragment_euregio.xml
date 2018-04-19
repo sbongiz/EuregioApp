@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="-40dp"
         android:rotation="-90"
-        app:srcCompat="@drawable/card_fronte" />
+        android:visibility="gone" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

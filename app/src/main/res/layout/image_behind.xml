@@ -15,6 +15,5 @@
         android:layout_gravity="bottom"
         android:layout_weight="1"
         android:elevation="16dp"
-        android:scaleType="centerCrop"
-        app:srcCompat="@drawable/card_fronte" />
+        android:scaleType="centerCrop" />
 </LinearLayout>

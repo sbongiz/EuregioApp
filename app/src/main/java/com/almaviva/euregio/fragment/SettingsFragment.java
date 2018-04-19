@@ -97,10 +97,11 @@ public class SettingsFragment extends PreferenceFragment {
 
         final ListPreference listaVisualizzazione = new ListPreference(getActivity());
 
-        String[] charSequenceLingua = new String[2];
+        String[] charSequenceLingua = new String[3];
 
         charSequenceLingua[0] = getString(R.string.lista_alfabetica);
         charSequenceLingua[1] = getString(R.string.lista_data);
+        charSequenceLingua[2] = getString(R.string.title_mappa);
 
         listaVisualizzazione.setKey("ordinamento_esercenti");
         listaVisualizzazione.setTitle(getString(R.string.visualizzazione_esercenti));
