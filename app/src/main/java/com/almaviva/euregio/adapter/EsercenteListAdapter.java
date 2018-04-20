@@ -91,11 +91,23 @@ public class EsercenteListAdapter extends BaseAdapter implements View.OnClickLis
         }
 
         int var  =convertedDate.getMonth()+1;
+        int year = convertedDate.getYear();
+        year = year +1900;
+        String anno = String.valueOf(year).substring(2);
+        String giorno =String.valueOf(convertedDate.getDate());
+        if(giorno.length()==1){
+            giorno = "0"+giorno;
+        }
 
-        String b = String.valueOf(var);
+        String mese = String.valueOf(var);
+
+        if(mese.length()==1){
+            mese ="0"+mese;
+        }
+
 
         holder.title.setText(listOfEsercenti.get(position).getTitle());
-        holder.data.setText(convertedDate.getDate()+"/"+b );
+        holder.data.setText(giorno+"/"+mese+"/"+anno );
         holder.indirizzo.setText(listOfEsercenti.get(position).getIndirizzo());
 
 

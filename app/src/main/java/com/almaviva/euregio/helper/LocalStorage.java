@@ -36,6 +36,9 @@ public  class LocalStorage {
     public static String testoCercatoMappa;
     public static boolean isLogged=false;
 
+    public static String prevoiusLanguageLista;
+    public static String prevoiusLanguageMap;
+
     public static LatLng myLastKnownLocation = null;
 
 
@@ -197,6 +200,22 @@ public  class LocalStorage {
 
     public static LatLng getMyLastKnownLocation(){
         return  myLastKnownLocation;
+    }
+
+
+    public static void setPrevoiusLanguageLista(String previousLanguageNew){
+        prevoiusLanguageLista = previousLanguageNew;
+    }
+    public static String getPrevoiusLanguageLista(){
+        return prevoiusLanguageLista;
+    }
+
+    public static void setPrevoiusLanguageMap(String prevoiusLanguageNew){
+        prevoiusLanguageMap = prevoiusLanguageNew;
+    }
+
+    public static String getPrevoiusLanguageMap(){
+        return prevoiusLanguageMap;
     }
 
 }

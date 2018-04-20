@@ -98,11 +98,11 @@ public class SettingsFragment extends PreferenceFragment {
 
         final ListPreference listaVisualizzazione = new ListPreference(getActivity());
 
-        String[] charSequenceLingua = new String[3];
+        String[] charSequenceLingua = new String[2];
 
         charSequenceLingua[0] = getString(R.string.lista_alfabetica);
         charSequenceLingua[1] = getString(R.string.lista_data);
-        charSequenceLingua[2] = getString(R.string.title_mappa);
+        //charSequenceLingua[2] = getString(R.string.title_mappa);
 
         listaVisualizzazione.setKey("ordinamento_esercenti");
         listaVisualizzazione.setTitle(getString(R.string.visualizzazione_esercenti));
@@ -198,6 +198,15 @@ public class SettingsFragment extends PreferenceFragment {
                 listaLingue.setSummary(newValue.toString());
                 spref.edit().putString("lingua", newValue.toString());
                 spref.edit().commit();
+
+                if(newValue.toString().equals("Italiano")){
+                    LocalStorage.setPrevoiusLanguageLista("Deutsch");
+                    LocalStorage.setPrevoiusLanguageMap("Deutsch");
+                }else{
+                    LocalStorage.setPrevoiusLanguageLista("Italiano");
+                    LocalStorage.setPrevoiusLanguageMap("Italiano");
+                }
+
 
                 return false;
             }

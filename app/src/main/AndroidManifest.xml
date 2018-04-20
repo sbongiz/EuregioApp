@@ -12,7 +12,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/new_icon_euregio_color"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -20,7 +20,8 @@
 
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -28,7 +29,8 @@
         </activity>
 
         <activity
-            android:name=".MainActivity">
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
                 <!-- to identify this activity as "searchable" -->
                 <intent-filter>
                     <action android:name="android.intent.action.SEARCH" />

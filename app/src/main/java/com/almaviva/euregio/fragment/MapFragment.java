@@ -159,9 +159,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             activity = (MainActivity) getActivity();
             contextMap = this;
-
-            if (LocalStorage.getListOfEsercentiFiltrataMappa().size() == 0) {
-                if (LocalStorage.getListOfEsercenti().size() != 0) {
+            String linguaAttuale = spref.getString("lingua","");
+            if (LocalStorage.getListOfEsercentiFiltrataMappa().size() == 0 || !(linguaAttuale.equals(LocalStorage.getPrevoiusLanguageMap()))) {
+                if (LocalStorage.getListOfEsercenti().size() != 0 && (linguaAttuale.equals(LocalStorage.getPrevoiusLanguageMap()))) {
                     LocalStorage.setListOfEsercentiFiltrataMappa(LocalStorage.getListOfEsercenti());
                     mapFragment.getMapAsync(this);
                 } else {
@@ -438,13 +438,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             for (Supplier sup : LocalStorage.getListOfEsercentiFiltrataMappa()) {
 
-                //DEVELOPER
-                if (sup.location.lat == null) {
-                    sup.location.lat = "46.082934";
-                }
-                if (sup.location.lon == null) {
-                    sup.location.lon = "11.283741";
-                }
+
 
                 if (sup.location.lat != null && sup.location.lon != null) {
 
@@ -1024,7 +1018,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 params.put("lang", "de");
             }
 
-            SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
+            SupplierRestClient.get("", params, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     // If the response is JSONObject instead of expected JSONArray

@@ -163,14 +163,20 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/layout_informazioni"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_margin="16dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layout_informazioni"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="vertical"
+                android:paddingBottom="90dp">
+
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
 
     </LinearLayout>
 </LinearLayout>

@@ -1,10 +1,15 @@
 package com.almaviva.euregio.fragment;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -18,6 +23,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.internal.view.SupportMenuItem;
@@ -25,23 +31,30 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.almaviva.euregio.MainActivity;
 import com.almaviva.euregio.R;
@@ -51,10 +64,15 @@ import com.almaviva.euregio.helper.BottomSheet3DialogFragment;
 import com.almaviva.euregio.helper.DebouncedQueryTextListener;
 import com.almaviva.euregio.helper.FilterHelper;
 import com.almaviva.euregio.helper.LocalStorage;
+import com.almaviva.euregio.mock.ImageRestClient;
 import com.almaviva.euregio.mock.SupplierRestClient;
 import com.almaviva.euregio.model.OrdineFiltro;
+import com.almaviva.euregio.model.Product;
 import com.almaviva.euregio.model.Supplier;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.gson.Gson;
+import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -62,10 +80,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
@@ -74,8 +100,8 @@ import cz.msebera.android.httpclient.Header;
 public class ListaFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private BottomSheetBehavior mBottomSheetBehavior;
-    private FrameLayout bottomSheet;
+    private AnchorBottomSheetBehavior mBottomSheetBehavior;
+    private View bottomSheet;
     private ListView esercentiList;
     public static TextView textViewNumeroRisultati;
     private TextView textViewFiltroOrdine;
@@ -98,6 +124,14 @@ public class ListaFragment extends Fragment {
     public static SwipeRefreshLayout swipeLayout;
     public static SharedPreferences spref;
     public static ProgressBar progressBarLista;
+    private LinearLayout layoutTelefono;
+    private LinearLayout layoutMail;
+    private LinearLayout layoutSito;
+    private LinearLayout layoutIndicazioni;
+    public static String immagineEsercentePath;
+    private ImageView imageBehind;
+    private LinearLayout layoutImmagine;
+    public static Context context;
 
     public ListaFragment() {
         // Required empty public constructor
@@ -120,28 +154,82 @@ public class ListaFragment extends Fragment {
 
             spref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             activity = getContext();
+            context = getContext();
             setHasOptionsMenu(true);
             risultati = getString(R.string.risultati);
             risultato = getString(R.string.risultato);
             findComponentInView(view);
-            progressBarLista.setVisibility(View.VISIBLE);
+
             setComponent();
             getEsercenti();
 
             setFiltriDaImpostazioni();
+            mBottomSheetBehavior = AnchorBottomSheetBehavior.from(bottomSheet);
+            mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_HIDDEN);
+
+
+            mBottomSheetBehavior.setBottomSheetCallback(new AnchorBottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+                    if (newState == AnchorBottomSheetBehavior.STATE_EXPANDED) {
+
+                        layoutImmagine.setVisibility(View.VISIBLE);
+                        animateImage();
+                    }
+                    if (newState == AnchorBottomSheetBehavior.STATE_COLLAPSED) {
+
+
+                    }
+                    if (newState == AnchorBottomSheetBehavior.STATE_DRAGGING) {
+                        layoutImmagine.setVisibility(View.GONE);
+                }
+                    if (newState == AnchorBottomSheetBehavior.STATE_SETTLING) {
+
+                    }
+                    if (newState == AnchorBottomSheetBehavior.STATE_HIDDEN) {
+                        layoutImmagine.setVisibility(View.GONE);
+                    }
+
+
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    // React to dragging events
+                }
+            });
+
+            bottomSheet.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    return true;
+                }
+            });
+
+            bottomSheet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_EXPANDED) {
+                        layoutImmagine.setVisibility(View.GONE);
+                        mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_HIDDEN);
+
+
+                    }
+                }
+            });
 
             //LISTENER
             esercentiList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    //  Esercente lesson = (Esercente) esercenteListAdapter.getItem(position);
+                    Supplier sup = (Supplier) esercentiList.getItemAtPosition(position);
+                    setDettaglioComponentInBottomSheet(sup);
 
-                    //  Intent intent = new Intent();
-                    //  intent.putExtra("SelectedLesson",lesson);
-                    //  setResult(Activity.RESULT_OK, intent);
-
-                    //  finish();
+                    if (mBottomSheetBehavior.getState() == AnchorBottomSheetBehavior.STATE_HIDDEN) {
+                        mBottomSheetBehavior.setState(AnchorBottomSheetBehavior.STATE_EXPANDED);
+                    }
                 }
             });
 
@@ -179,6 +267,245 @@ public class ListaFragment extends Fragment {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
         return view;
+    }
+
+    public void setDettaglioComponentInBottomSheet(final Supplier supSelected) {
+
+
+
+       try {
+
+
+
+           if (supSelected.pictureUrl != null) {
+
+               final String idCorrente = String.valueOf(supSelected.id);
+               ImageRestClient.get(supSelected.pictureUrl, null, new FileAsyncHttpResponseHandler(getActivity()) {
+
+                   @Override
+                   public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
+                       String a = "";
+                   }
+
+                   @Override
+                   public void onSuccess(int statusCode, Header[] headers, File file) {
+
+                       SharedPreferences.Editor editor = spref.edit();
+
+
+                       File fileNuovo = new File(getContext().getFilesDir(), "immagineEsercente_" + idCorrente);
+                       try {
+
+                           InputStream is = new FileInputStream(file);
+                           OutputStream os = new FileOutputStream(fileNuovo);
+                           byte[] buff = new byte[1024];
+                           int len;
+                           while ((len = is.read(buff)) > 0) {
+                               os.write(buff, 0, len);
+                           }
+                           is.close();
+                           os.close();
+
+
+                       } catch (IOException e) {
+
+                       }
+                   }
+               });
+           }
+
+
+           immagineEsercentePath = getContext().getFilesDir() + "/" + "immagineEsercente_" + supSelected.id;
+
+           TextView esercenteDettaglioTitolo = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_titolo);
+           final TextView esercenteDettaglioData = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_data);
+           TextView esercenteDettaglioIndirizzo = (TextView) bottomSheet.findViewById(R.id.esercente_dettaglio_indirizzo);
+           LinearLayout esercenteDettaglioLungo = (LinearLayout) bottomSheet.findViewById(R.id.layout_informazioni);
+           layoutTelefono = (LinearLayout) bottomSheet.findViewById(R.id.layout_telefono);
+           layoutMail = (LinearLayout) bottomSheet.findViewById(R.id.layout_mail);
+           layoutSito = (LinearLayout) bottomSheet.findViewById(R.id.layout_sito);
+           layoutIndicazioni = (LinearLayout) bottomSheet.findViewById(R.id.layout_indicazioni);
+
+           ArrayList<Product> listaVantaggi = supSelected.products;
+
+           esercenteDettaglioLungo.removeAllViews();
+
+           for (Product vant : listaVantaggi) {
+
+               TextView textTmp = new TextView(getActivity());
+               TextView textTmpLunga = new TextView(getActivity());
+               textTmp.setText(vant.getDescriptionShort());
+               textTmpLunga.setText(vant.description);
+               textTmp.setTextColor(getResources().getColor(R.color.colorPrimary));
+               textTmpLunga.setTextColor(getResources().getColor(R.color.colorPrimary));
+               textTmp.setTextSize(13);
+               textTmpLunga.setTextSize(13);
+
+               textTmpLunga.setGravity(Gravity.CENTER_VERTICAL);
+
+               esercenteDettaglioLungo.addView(textTmpLunga);
+
+           }
+
+
+           esercenteDettaglioTitolo.setText(supSelected.title);
+
+           String data = supSelected.lastUpdate;
+           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+           Date convertedDate = new Date();
+           try {
+               convertedDate = sdf.parse(data);
+           } catch (ParseException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+           }
+
+
+           int var  =convertedDate.getMonth()+1;
+           int year = convertedDate.getYear();
+           year = year +1900;
+           String anno = String.valueOf(year).substring(2);
+           String giorno =String.valueOf(convertedDate.getDate());
+           if(giorno.length()==1){
+               giorno = "0"+giorno;
+           }
+
+           String mese = String.valueOf(var);
+
+           if(mese.length()==1){
+               mese ="0"+mese;
+           }
+
+           String b = String.valueOf(var);
+
+           esercenteDettaglioData.setText(giorno+"/"+mese);
+           esercenteDettaglioIndirizzo.setText(supSelected.location.description);
+
+
+           layoutTelefono.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+
+                   if (supSelected != null && supSelected.phone != null) {
+                       MainActivity activity = (MainActivity) getActivity();
+                       if (activity != null) {
+                           if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                               Intent callIntent = new Intent(Intent.ACTION_CALL);
+                               callIntent.setData(Uri.parse("tel:" + supSelected.phone));
+                               startActivity(callIntent);
+                           } else {
+                               // No explanation needed; request the permission
+                               ActivityCompat.requestPermissions(activity,
+                                       new String[]{Manifest.permission.CALL_PHONE},
+                                       1);
+                           }
+                       }
+                   } else {
+                       Context context = getContext();
+                       CharSequence text = getString(R.string.errore_funzione);
+                       int duration = Toast.LENGTH_SHORT;
+
+                       Toast toast = Toast.makeText(context, text, duration);
+                       toast.show();
+                   }
+
+               }
+           });
+
+           layoutMail.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+
+
+                   if (supSelected != null && supSelected.email != null) {
+                       Intent intent = new Intent(Intent.ACTION_SEND);
+                       intent.setType("message/rfc822");
+                       intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{supSelected.email});
+                       intent.putExtra(Intent.EXTRA_SUBJECT, "");
+                       intent.putExtra(Intent.EXTRA_TEXT, "");
+                       Intent mailer = Intent.createChooser(intent, null);
+                       startActivity(mailer);
+                   } else {
+                       Context context = getContext();
+                       CharSequence text = getString(R.string.errore_funzione);
+                       int duration = Toast.LENGTH_SHORT;
+
+                       Toast toast = Toast.makeText(context, text, duration);
+                       toast.show();
+                   }
+
+               }
+           });
+
+           layoutSito.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   if (supSelected != null && supSelected.web != null) {
+                       String url = "http://" + supSelected.web;
+                       Intent i = new Intent(Intent.ACTION_VIEW);
+                       i.setData(Uri.parse(url));
+                       startActivity(i);
+                   } else {
+                       Context context = getContext();
+                       CharSequence text = getString(R.string.errore_funzione);
+                       int duration = Toast.LENGTH_SHORT;
+
+                       Toast toast = Toast.makeText(context, text, duration);
+                       toast.show();
+                   }
+
+               }
+           });
+
+           layoutIndicazioni.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+
+                   if(supSelected.location.lat!=null && supSelected.location.lon!=null){
+                       String lat = Double.toString(Double.parseDouble(supSelected.location.lat));
+                       String lon = Double.toString(Double.parseDouble(supSelected.location.lon));
+                       Uri gmmIntentUri = Uri.parse("google.navigation:q=" + lat + "," + lon);
+                       Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                       mapIntent.setPackage("com.google.android.apps.maps");
+                       startActivity(mapIntent);
+                   }else{
+                       Context context = getContext();
+                       CharSequence text = getString(R.string.errore_funzione);
+                       int duration = Toast.LENGTH_SHORT;
+
+                       Toast toast = Toast.makeText(context, text, duration);
+                       toast.show();
+                   }
+
+               }
+           });
+       } catch (Exception e) {
+           Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+       }
+
+
+    }
+
+
+    public void animateImage() {
+        try {
+
+            if (immagineEsercentePath != null) {
+                File fileImmagine = new File(immagineEsercentePath);
+                Bitmap myBitmap = BitmapFactory.decodeFile(fileImmagine.getAbsolutePath());
+                imageBehind.setImageBitmap(myBitmap);
+                Resources r = getResources();
+                float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 181, r.getDisplayMetrics());
+                Animation animation = new TranslateAnimation(0, 0, px, 0);
+                animation.setDuration(1000);
+                animation.setFillAfter(true);
+                imageBehind.startAnimation(animation);
+            }
+
+        } catch (Exception e) {
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+
     }
 
 
@@ -286,7 +613,10 @@ public class ListaFragment extends Fragment {
     public void getEsercenti() throws ParseException {
         try {
             esercentiArrayList = new ArrayList<Supplier>();
-            if (LocalStorage.getListOfEsercenti().size() == 0) {
+            String linguaAttuale = spref.getString("lingua","");
+
+
+            if (LocalStorage.getListOfEsercenti().size() == 0 || !(linguaAttuale.equals(LocalStorage.getPrevoiusLanguageLista()))) {
                 retriveFilterAsyncTask();
             } else {
                 FilterHelper.filtraTotale(getActivity());
@@ -324,10 +654,42 @@ public class ListaFragment extends Fragment {
             textViewFiltroOrdine = (TextView) view.findViewById(R.id.textView_filtro_ordine);
             progressBarLista = (ProgressBar) view.findViewById(R.id.progressBarLista);
             swipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeLayout);
+            bottomSheet = view.findViewById(R.id.bottom_sheet);
+            layoutImmagine = view.findViewById(R.id.image_dietro);
+            imageBehind = layoutImmagine.findViewById(R.id.image_behind_inside);
+
+            final View thisView = view;
+            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    int heightDiff = thisView.getRootView().getHeight() - thisView.getHeight();
+                    if (heightDiff > dpToPx(200)) { // if more than 200 dp, it's probably a keyboard...
+
+
+                    } else {
+                        MainActivity activity = (MainActivity) getActivity();
+                        if(activity!=null){
+                            activity.getWindow().getDecorView().setSystemUiVisibility(
+                                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                        }
+                    }
+                }
+            });
         } catch (Exception e) {
             Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
         }
 
+    }
+
+    public float dpToPx(float valueInDp) {
+        try{
+            DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
+        }catch (Exception e){
+            Log.e(Thread.currentThread().getStackTrace().toString(), e.toString());
+        }
+        return 0f;
     }
 
     private void setMenuComponent(Menu menu) {
@@ -521,7 +883,7 @@ public class ListaFragment extends Fragment {
 
     public static void retriveFilterAsyncTask() {
         try {
-            // progressBarLista.setVisibility(View.VISIBLE);
+            progressBarLista.setVisibility(View.VISIBLE);
             esercentiArrayList = new ArrayList<Supplier>();
 
             String lingua = spref.getString("lingua", "");
@@ -532,7 +894,7 @@ public class ListaFragment extends Fragment {
                 params.put("lang", "de");
             }
 
-            SupplierRestClient.get("", null, new JsonHttpResponseHandler() {
+            SupplierRestClient.get("", params, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     // If the response is JSONObject instead of expected JSONArray

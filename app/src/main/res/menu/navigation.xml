@@ -12,8 +12,8 @@
 
     <item
         android:id="@+id/navigation_euregio"
-        android:icon="@drawable/icon_euregio"
-        android:title="@string/title_euregio" />
+        android:icon="@drawable/euregioicon"
+        android:title="@string/efpalto_adige" />
 
     <item
         android:id="@+id/navigation_impostazioni"

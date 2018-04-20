@@ -9,7 +9,7 @@
     <string name="title_activity_maps">Map</string>
     <string name="title_search">Ricerca</string>
     <string name="hint_search">ricerca...</string>
-    <string name="conferma_button">CONFERMA</string>
+    <string name="conferma_button">FATTO</string>
     <string name="reset_button">RESET</string>
     <string name="tutte">Tutte</string>
     <string name="tutti">Tutti</string>
@@ -42,4 +42,5 @@
     <string name="errore_login">Attenzione! Login non andato a buon fine</string>
     <string name="errore_funzione">Attenzione! Funzione non abilitata per questo esercente</string>
     <string name="logout">Logout avvenuto con successo</string>
+    <string name="efpalto_adige">EFP Alto Adige</string>
 </resources>

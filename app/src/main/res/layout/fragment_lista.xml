@@ -64,6 +64,11 @@
             android:layout_height="match_parent" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
-
+    <include
+        android:id="@+id/bottom_sheet"
+        layout="@layout/bottom_sheet" />
+    <include
+        android:id="@+id/image_dietro"
+        layout="@layout/image_behind"
+        android:visibility="gone" />
 </android.support.design.widget.CoordinatorLayout>

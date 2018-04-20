@@ -31,7 +31,16 @@ public class Supplier {
     }
 
     public String getIndirizzo(){
-        return this.location.description + "," + this.location.municipality;
+
+        if(this.location.description == null && this.location.municipality!=null){
+            return this.location.municipality;
+        }else if(this.location.description!= null && this.location.municipality == null){
+            return this.location.description;
+        }else if(this.location.description == null && this.location.municipality == null){
+            return "";
+        }else{
+            return this.location.description + "," + this.location.municipality;
+        }
     }
 
     public ArrayList<Product> getListaVantaggi(){
